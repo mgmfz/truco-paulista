@@ -160,6 +160,42 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 #btn-sair-sala{position:fixed;top:calc(max(env(safe-area-inset-top),8px) + 8px);right:10px;width:36px;height:36px;border-radius:50%;background:rgba(192,57,43,.25);border:1.5px solid rgba(192,57,43,.4);display:none;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;z-index:150;transition:background .15s;}
 #btn-sair-sala:active{background:rgba(192,57,43,.5);}
 .desconectado-banner{position:fixed;top:0;left:0;right:0;background:rgba(192,57,43,.92);color:#fff;text-align:center;font-weight:800;font-size:.85rem;padding:10px;z-index:400;display:none;letter-spacing:.3px;}
+
+/* DRAG & DROP */
+.drop-zone{
+  position:relative;
+  border:2.5px dashed rgba(201,162,39,0);
+  border-radius:16px;
+  transition:border-color .2s, background .2s;
+  min-width:120px;
+}
+.drop-zone.drag-over{
+  border-color:rgba(201,162,39,.7);
+  background:rgba(201,162,39,.08);
+}
+.carta.dragging{
+  opacity:.35;
+  transform:scale(.96);
+}
+.carta-fantasma{
+  position:fixed;
+  pointer-events:none;
+  z-index:999;
+  transform:rotate(-6deg) scale(1.12);
+  box-shadow:0 20px 40px rgba(0,0,0,.55);
+  transition:none;
+  border-radius:9px;
+}
+.drop-arrow{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:1.8rem;
+  opacity:0;
+  transition:opacity .2s;
+  pointer-events:none;
+}
+.drop-zone.drag-over .drop-arrow{opacity:.9;}
 </style>
 </head>
 <body>
@@ -222,7 +258,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
       <div class="vira-lbl">Vira</div>
       <div id="vira-el"></div>
     </div>
-    <div class="jogadas" id="jogadas"></div>
+    <div class="jogadas drop-zone" id="jogadas"><div class="drop-arrow">🎴</div></div>
   </div>
 
   <div class="minha-mao-wrap">
@@ -464,31 +500,129 @@ function renderMao(e){
   const ehVez=e.vez===meuId&&e.status==='jogando'&&e.trucoStatus==='normal';
   mao.forEach((carta,i)=>{
     const c=mkCarta(carta,`cn ${ehVez?'':'cdisabled'}`,e.manilhas||[]);
-    if(ehVez){
-      c.addEventListener('click',()=>tapCarta(i,c,e));
-      c.addEventListener('touchend',ev=>{ev.preventDefault();tapCarta(i,c,e);},{passive:false});
-    }
+    if(ehVez) iniciarDrag(c,i);
     el.appendChild(c);
   });
-  document.getElementById('tap-hint').textContent=ehVez?'Toque 1x: selecionar  ·  2x: jogar':'';
+  document.getElementById('tap-hint').textContent=ehVez?'Arraste a carta para o centro para jogar':'';
 }
 
-function tapCarta(idx,el,e){
-  // Always read fresh state from estadoJogo to avoid stale closure
-  const estado=estadoJogo;
-  if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal')return;
-  if(cartaSel===idx){
-    // Second tap on same card → play it
+// ── DRAG ────────────────────────────────────────────────────
+let dragIdx=null, fantasma=null, dropZoneEl=null;
+
+function iniciarDrag(cartaEl, idx){
+  const dz=document.getElementById('jogadas');
+
+  // Touch events (mobile)
+  cartaEl.addEventListener('touchstart', ev=>{
+    ev.preventDefault();
+    const estado=estadoJogo;
+    if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal') return;
+    dragIdx=idx;
+    dropZoneEl=dz;
+
+    // highlight card
+    cartaEl.classList.add('csel');
+
+    // create ghost
+    const t=ev.touches[0];
+    const rect=cartaEl.getBoundingClientRect();
+    fantasma=cartaEl.cloneNode(true);
+    fantasma.className=cartaEl.className+' carta-fantasma';
+    fantasma.style.width=rect.width+'px';
+    fantasma.style.height=rect.height+'px';
+    fantasma.style.left=(t.clientX-rect.width/2)+'px';
+    fantasma.style.top=(t.clientY-rect.height*0.6)+'px';
+    document.body.appendChild(fantasma);
+    cartaEl.classList.add('dragging');
+  },{passive:false});
+
+  cartaEl.addEventListener('touchmove', ev=>{
+    ev.preventDefault();
+    if(!fantasma) return;
+    const t=ev.touches[0];
+    const w=parseFloat(fantasma.style.width);
+    const h=parseFloat(fantasma.style.height);
+    fantasma.style.left=(t.clientX-w/2)+'px';
+    fantasma.style.top=(t.clientY-h*0.6)+'px';
+
+    // check if over drop zone
+    const dzRect=dz.getBoundingClientRect();
+    const over=t.clientX>=dzRect.left&&t.clientX<=dzRect.right&&t.clientY>=dzRect.top&&t.clientY<=dzRect.bottom;
+    dz.classList.toggle('drag-over', over);
+  },{passive:false});
+
+  cartaEl.addEventListener('touchend', ev=>{
+    ev.preventDefault();
+    if(!fantasma){dragIdx=null;return;}
+    const t=ev.changedTouches[0];
+    const dzRect=dz.getBoundingClientRect();
+    const dropped=t.clientX>=dzRect.left&&t.clientX<=dzRect.right&&t.clientY>=dzRect.top&&t.clientY<=dzRect.bottom;
+
+    // cleanup
+    fantasma.remove(); fantasma=null;
+    dz.classList.remove('drag-over');
+    document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
     document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
-    cartaSel=null;
-    jogarCarta(idx,estado);
-  }else{
-    // First tap → select
-    document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
-    el.classList.add('csel');
-    cartaSel=idx;
-  }
+
+    if(dropped && dragIdx!==null){
+      const estado=estadoJogo;
+      if(estado&&estado.vez===meuId&&estado.trucoStatus==='normal'){
+        jogarCarta(dragIdx, estado);
+      }
+    }
+    dragIdx=null;
+  },{passive:false});
+
+  // Mouse events (desktop fallback)
+  cartaEl.addEventListener('mousedown', ev=>{
+    const estado=estadoJogo;
+    if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal') return;
+    dragIdx=idx;
+    cartaEl.classList.add('csel');
+    const rect=cartaEl.getBoundingClientRect();
+    fantasma=cartaEl.cloneNode(true);
+    fantasma.className=cartaEl.className+' carta-fantasma';
+    fantasma.style.width=rect.width+'px';
+    fantasma.style.height=rect.height+'px';
+    fantasma.style.left=(ev.clientX-rect.width/2)+'px';
+    fantasma.style.top=(ev.clientY-rect.height*0.6)+'px';
+    document.body.appendChild(fantasma);
+    cartaEl.classList.add('dragging');
+  });
 }
+
+document.addEventListener('mousemove', ev=>{
+  if(!fantasma) return;
+  const w=parseFloat(fantasma.style.width);
+  const h=parseFloat(fantasma.style.height);
+  fantasma.style.left=(ev.clientX-w/2)+'px';
+  fantasma.style.top=(ev.clientY-h*0.6)+'px';
+  const dz=document.getElementById('jogadas');
+  if(dz){
+    const r=dz.getBoundingClientRect();
+    const over=ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom;
+    dz.classList.toggle('drag-over',over);
+  }
+});
+
+document.addEventListener('mouseup', ev=>{
+  if(!fantasma){dragIdx=null;return;}
+  const dz=document.getElementById('jogadas');
+  let dropped=false;
+  if(dz){
+    const r=dz.getBoundingClientRect();
+    dropped=ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom;
+    dz.classList.remove('drag-over');
+  }
+  fantasma.remove(); fantasma=null;
+  document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
+  document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
+  if(dropped&&dragIdx!==null){
+    const estado=estadoJogo;
+    if(estado&&estado.vez===meuId&&estado.trucoStatus==='normal') jogarCarta(dragIdx,estado);
+  }
+  dragIdx=null;
+});
 
 function mkCarta(carta,extra,man){
   const el=document.createElement('div');
