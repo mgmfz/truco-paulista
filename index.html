@@ -17,29 +17,30 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.01) 0,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 10px),repeating-linear-gradient(-45deg,rgba(255,255,255,0.01) 0,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 10px);z-index:-1;}
 
 /* LOGIN */
-#tela-login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:1.5rem;gap:1.1rem;overflow-y:auto;}
-.logo{font-family:'Abril Fatface',serif;font-size:clamp(2.8rem,14vw,4.5rem);color:var(--dourado-claro);text-shadow:3px 3px 0 #7a5c00,0 8px 24px rgba(0,0,0,0.5);letter-spacing:2px;line-height:1;text-align:center;}
-.logo-sub{font-size:clamp(0.72rem,3vw,1rem);color:var(--creme);letter-spacing:5px;text-transform:uppercase;opacity:.75;margin-top:-.3rem;}
-.card{background:rgba(8,32,16,.82);border:2px solid rgba(201,162,39,.35);border-radius:20px;padding:1.4rem;width:100%;max-width:380px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:.85rem;}
-.card h2{font-family:'Abril Fatface',serif;color:var(--dourado-claro);font-size:1.25rem;text-align:center;}
-.campo label{display:block;font-size:.7rem;color:var(--creme);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem;opacity:.8;}
-.campo input{width:100%;padding:.82rem 1rem;border-radius:10px;border:1.5px solid rgba(201,162,39,.25);background:rgba(0,0,0,.35);color:var(--branco);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:700;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
-.campo input:focus{border-color:var(--dourado);background:rgba(0,0,0,.5);}
-.divisor{display:flex;align-items:center;gap:.7rem;color:rgba(245,240,232,.35);font-size:.78rem;}
+#tela-login{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100%;padding:max(env(safe-area-inset-top),24px) 20px max(env(safe-area-inset-bottom),24px);gap:0;overflow-y:auto;}
+.login-inner{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:420px;flex:1;justify-content:center;padding:16px 0;}
+.logo{font-family:'Abril Fatface',serif;font-size:clamp(3.5rem,18vw,5.5rem);color:var(--dourado-claro);text-shadow:3px 3px 0 #7a5c00,0 8px 24px rgba(0,0,0,0.5);letter-spacing:2px;line-height:1;text-align:center;}
+.logo-sub{font-size:clamp(0.85rem,4vw,1.1rem);color:var(--creme);letter-spacing:6px;text-transform:uppercase;opacity:.75;margin-top:4px;margin-bottom:28px;}
+.card{background:rgba(8,32,16,.85);border:2px solid rgba(201,162,39,.4);border-radius:22px;padding:clamp(1.4rem,5vw,2rem);width:100%;backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:clamp(.9rem,3vw,1.1rem);}
+.card h2{font-family:'Abril Fatface',serif;color:var(--dourado-claro);font-size:clamp(1.3rem,5vw,1.55rem);text-align:center;}
+.campo label{display:block;font-size:clamp(.72rem,2.8vw,.82rem);color:var(--creme);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;opacity:.8;}
+.campo input{width:100%;padding:clamp(.82rem,3.5vw,1rem) 1rem;border-radius:12px;border:1.5px solid rgba(201,162,39,.28);background:rgba(0,0,0,.38);color:var(--branco);font-family:'Nunito',sans-serif;font-size:clamp(1rem,4vw,1.1rem);font-weight:700;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+.campo input:focus{border-color:var(--dourado);background:rgba(0,0,0,.55);}
+.divisor{display:flex;align-items:center;gap:.7rem;color:rgba(245,240,232,.35);font-size:clamp(.75rem,3vw,.85rem);}
 .divisor::before,.divisor::after{content:'';flex:1;height:1px;background:rgba(245,240,232,.15);}
-.btn{width:100%;padding:.88rem;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:transform .1s,opacity .1s;letter-spacing:.4px;user-select:none;}
+.btn{width:100%;padding:clamp(.9rem,4vw,1.05rem);border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-size:clamp(1rem,4vw,1.1rem);font-weight:800;cursor:pointer;transition:transform .1s,opacity .1s;letter-spacing:.4px;user-select:none;}
 .btn:active{transform:scale(.97);opacity:.87;}
 .btn-ouro{background:linear-gradient(135deg,#c9a227,#f0c040);color:#2a1500;}
 .btn-ghost{background:rgba(255,255,255,.09);color:var(--branco);border:1.5px solid rgba(255,255,255,.18);}
 .btn-red{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
 .btn-green{background:linear-gradient(135deg,#145e30,#27ae60);color:#fff;}
-.hint{font-size:.74rem;color:rgba(245,240,232,.42);text-align:center;line-height:1.55;max-width:280px;}
+.hint{font-size:clamp(.72rem,2.8vw,.8rem);color:rgba(245,240,232,.42);text-align:center;line-height:1.55;max-width:320px;}
 .hint a{color:var(--dourado-claro);}
 
 /* AGUARDANDO */
-#tela-aguardando{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:2rem;gap:1.1rem;text-align:center;}
-.codigo-sala{font-family:'Abril Fatface',serif;font-size:clamp(3rem,16vw,5rem);color:var(--dourado-claro);letter-spacing:10px;text-shadow:3px 3px 0 #7a5c00;}
-.pulse{width:54px;height:54px;border-radius:50%;background:rgba(201,162,39,.25);animation:pulseA 1.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+#tela-aguardando{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:max(env(safe-area-inset-top),2rem) 1.5rem max(env(safe-area-inset-bottom),2rem);gap:clamp(1rem,4vw,1.4rem);text-align:center;}
+.codigo-sala{font-family:'Abril Fatface',serif;font-size:clamp(3.5rem,18vw,6rem);color:var(--dourado-claro);letter-spacing:12px;text-shadow:3px 3px 0 #7a5c00;}
+.pulse{width:clamp(54px,14vw,70px);height:clamp(54px,14vw,70px);border-radius:50%;background:rgba(201,162,39,.25);animation:pulseA 1.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-size:clamp(1.6rem,6vw,2rem);}
 @keyframes pulseA{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.18);opacity:1}}
 
 /* JOGO */
@@ -122,12 +123,50 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 /* TOAST */
 #toast{position:fixed;bottom:calc(max(env(safe-area-inset-bottom),12px) + 8px);left:50%;transform:translateX(-50%) translateY(80px);background:rgba(8,28,14,.96);border:1.5px solid var(--dourado);color:var(--dourado-claro);padding:.62rem 1.4rem;border-radius:50px;font-family:'Abril Fatface',serif;font-size:.93rem;letter-spacing:.4px;z-index:300;transition:transform .28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;}
 #toast.show{transform:translateX(-50%) translateY(0);}
+
+/* CHAT */
+#chat-btn{position:fixed;bottom:calc(max(env(safe-area-inset-bottom),12px) + 8px);right:12px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a6b3c,#27ae60);border:2px solid rgba(201,162,39,.5);display:none;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;z-index:150;box-shadow:0 4px 16px rgba(0,0,0,.45);transition:transform .15s;}
+#chat-btn:active{transform:scale(.9);}
+#chat-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#e74c3c;font-size:.62rem;font-weight:900;color:#fff;display:none;align-items:center;justify-content:center;border:2px solid #0d4526;}
+#chat-badge.show{display:flex;}
+#chat-panel{position:fixed;bottom:0;right:0;width:min(320px,100vw);height:min(460px,72vh);background:linear-gradient(170deg,#102a18,#0a1e10);border:1.5px solid rgba(201,162,39,.3);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:250;box-shadow:-4px -4px 32px rgba(0,0,0,.5);transform:translateY(100%);transition:transform .28s cubic-bezier(.34,1.56,.64,1);}
+#chat-panel.open{transform:translateY(0);}
+#chat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(201,162,39,.2);flex-shrink:0;}
+#chat-header span{font-family:'Abril Fatface',serif;color:var(--dourado-claro);font-size:1rem;letter-spacing:.5px;}
+#chat-fechar{background:none;border:none;color:rgba(245,240,232,.5);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:8px;line-height:1;}
+#chat-fechar:active{background:rgba(255,255,255,.1);}
+#chat-msgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;scroll-behavior:smooth;}
+#chat-msgs::-webkit-scrollbar{width:3px;}
+#chat-msgs::-webkit-scrollbar-thumb{background:rgba(201,162,39,.3);border-radius:3px;}
+.msg{display:flex;flex-direction:column;max-width:82%;}
+.msg.minha{align-self:flex-end;align-items:flex-end;}
+.msg.dele{align-self:flex-start;align-items:flex-start;}
+.msg-nome{font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;opacity:.55;}
+.msg-bub{padding:7px 11px;border-radius:14px;font-size:.88rem;font-weight:600;line-height:1.4;word-break:break-word;}
+.msg.minha .msg-bub{background:linear-gradient(135deg,#1a5c32,#27ae60);color:#fff;border-radius:14px 14px 4px 14px;}
+.msg.dele .msg-bub{background:rgba(255,255,255,.12);color:var(--branco);border-radius:14px 14px 14px 4px;}
+.msg-hora{font-size:.58rem;color:rgba(245,240,232,.3);margin-top:2px;}
+.msg-sys{align-self:center;font-size:.68rem;color:rgba(245,240,232,.32);font-style:italic;padding:2px 0;}
+#chat-input-area{display:flex;gap:7px;padding:8px 10px;border-top:1px solid rgba(201,162,39,.15);flex-shrink:0;background:rgba(0,0,0,.2);}
+#chat-input{flex:1;padding:9px 12px;border-radius:50px;border:1.5px solid rgba(201,162,39,.2);background:rgba(0,0,0,.4);color:var(--branco);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;outline:none;-webkit-appearance:none;}
+#chat-input:focus{border-color:rgba(201,162,39,.5);}
+#chat-send{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#c9a227,#f0c040);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:transform .12s;}
+#chat-send:active{transform:scale(.88);}
+.reacoes{display:flex;gap:5px;padding:5px 10px 0;flex-shrink:0;overflow-x:auto;}
+.reacao{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:4px 10px;font-size:.82rem;cursor:pointer;color:var(--branco);font-family:'Nunito',sans-serif;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.reacao:active{background:rgba(255,255,255,.18);}
+
+/* SAIR DA SALA */
+#btn-sair-sala{position:fixed;top:calc(max(env(safe-area-inset-top),8px) + 8px);right:10px;width:36px;height:36px;border-radius:50%;background:rgba(192,57,43,.25);border:1.5px solid rgba(192,57,43,.4);display:none;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;z-index:150;transition:background .15s;}
+#btn-sair-sala:active{background:rgba(192,57,43,.5);}
+.desconectado-banner{position:fixed;top:0;left:0;right:0;background:rgba(192,57,43,.92);color:#fff;text-align:center;font-weight:800;font-size:.85rem;padding:10px;z-index:400;display:none;letter-spacing:.3px;}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="tela-login">
+  <div class="login-inner">
   <div class="logo">🃏 Truco</div>
   <div class="logo-sub">Paulista</div>
   <div class="card">
@@ -145,6 +184,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
     <button class="btn btn-ghost" onclick="entrarSala()">🚪 Entrar na Sala</button>
     <div class="hint" id="hint-config">⚙️ Configure o Firebase em <code>config.js</code> para jogar online.</div>
   </div>
+  </div><!-- /login-inner -->
 </div>
 
 <!-- AGUARDANDO -->
@@ -154,8 +194,8 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
   <div style="color:var(--creme);font-size:.83rem;opacity:.7">Código da Sala</div>
   <div class="codigo-sala" id="exibe-codigo">----</div>
   <div class="hint">Mande este código para seu amigo entrar na sala!</div>
-  <button class="btn btn-ghost" style="max-width:280px" onclick="copiarCodigo()">📋 Copiar Código</button>
-  <button class="btn btn-red" style="max-width:280px;margin-top:4px" onclick="sairSala()">✖ Cancelar</button>
+  <button class="btn btn-ghost" style="max-width:340px;font-size:clamp(1rem,4vw,1.1rem)" onclick="copiarCodigo()">📋 Copiar Código</button>
+  <button class="btn btn-red" style="max-width:340px;margin-top:4px;font-size:clamp(1rem,4vw,1.1rem)" onclick="sairSala()">✖ Cancelar</button>
 </div>
 
 <!-- JOGO -->
@@ -203,6 +243,41 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 </div>
 
 <div id="toast"></div>
+
+<!-- BOTÃO SAIR -->
+<div id="btn-sair-sala" onclick="confirmarSaida()" title="Sair da sala">🚪</div>
+
+<!-- BANNER DESCONECTADO -->
+<div class="desconectado-banner" id="banner-desconect">⚠️ Seu adversário saiu da sala!</div>
+
+
+<!-- CHAT BTN -->
+<div id="chat-btn" onclick="toggleChat()">
+  💬
+  <div id="chat-badge"></div>
+</div>
+
+<!-- CHAT PANEL -->
+<div id="chat-panel">
+  <div id="chat-header">
+    <span>💬 Chat</span>
+    <button id="chat-fechar" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="chat-msgs"></div>
+  <div class="reacoes">
+    <button class="reacao" onclick="enviarReacao('😂')">😂</button>
+    <button class="reacao" onclick="enviarReacao('🔥 Truco!')">🔥 Truco!</button>
+    <button class="reacao" onclick="enviarReacao('😤')">😤</button>
+    <button class="reacao" onclick="enviarReacao('👏')">👏</button>
+    <button class="reacao" onclick="enviarReacao('🃏 Boa!')">🃏 Boa!</button>
+    <button class="reacao" onclick="enviarReacao('😬')">😬</button>
+  </div>
+  <div id="chat-input-area">
+    <input id="chat-input" type="text" placeholder="Mensagem..." maxlength="120" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button id="chat-send" onclick="enviarMsg()">➤</button>
+  </div>
+</div>
+
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -278,6 +353,7 @@ function entrarSala(){
     salaRef.child('jogadores/j2').set({nome,online:true});
     salaRef.child('status').set('iniciando');
     tela('jogo');ouvirSala();
+    setTimeout(()=>{initChat();mostrarChatBtn();mostrarBtnSair();monitorarDesconexao();},800);
   });
 }
 
@@ -286,7 +362,7 @@ function ouvirSala(){
     const d=snap.val();if(!d)return;
     estadoJogo=d;
     if(d.status==='iniciando'&&meuId==='j1')iniciarPartida();
-    else if(d.status==='jogando'||d.status==='mao11'){tela('jogo');render();}
+    else if(d.status==='jogando'||d.status==='mao11'){tela('jogo');render();mostrarChatBtn();mostrarBtnSair();monitorarDesconexao();}
     else if(d.status==='fim')mostrarFim(d);
   });
 }
@@ -299,6 +375,7 @@ function copiarCodigo(){
 
 // ── PARTIDA ──────────────────────────────────────────────────
 function iniciarPartida(){
+  setTimeout(()=>{if(!chatRef)initChat();},500);
   const b=shuffle(criarBaralho());
   const vira=b[6];
   salaRef.set({
@@ -558,10 +635,139 @@ function toast(msg){
   clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2700);
 }
 
+
+// ── CHAT ────────────────────────────────────────────────────
+let chatRef = null;
+let chatAberto = false;
+let msgNaoLidas = 0;
+let ultimaMsgVista = 0;
+
+function initChat() {
+  if (!salaRef) return;
+  chatRef = db.ref('salas/' + salaId + '/chat');
+  chatRef.on('child_added', snap => {
+    const msg = snap.val();
+    adicionarMsgUI(msg);
+    if (!chatAberto && msg.autor !== meuId) {
+      msgNaoLidas++;
+      atualizarBadge();
+    }
+  });
+}
+
+function toggleChat() {
+  chatAberto = !chatAberto;
+  const panel = document.getElementById('chat-panel');
+  if (chatAberto) {
+    panel.classList.add('open');
+    msgNaoLidas = 0;
+    atualizarBadge();
+    setTimeout(() => {
+      const msgs = document.getElementById('chat-msgs');
+      msgs.scrollTop = msgs.scrollHeight;
+      document.getElementById('chat-input').focus();
+    }, 200);
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function atualizarBadge() {
+  const badge = document.getElementById('chat-badge');
+  if (msgNaoLidas > 0) {
+    badge.textContent = msgNaoLidas > 9 ? '9+' : msgNaoLidas;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+function enviarMsg() {
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim();
+  if (!txt || !chatRef) return;
+  inp.value = '';
+  const msg = {
+    texto: txt,
+    autor: meuId,
+    nome: meuNome,
+    ts: Date.now()
+  };
+  chatRef.push(msg);
+}
+
+function enviarReacao(txt) {
+  if (!chatRef) return;
+  chatRef.push({ texto: txt, autor: meuId, nome: meuNome, ts: Date.now() });
+}
+
+function adicionarMsgUI(msg) {
+  const container = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (msg.autor === meuId ? 'minha' : 'dele');
+  const hora = new Date(msg.ts).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = '<div class="msg-nome">' + escHtml(msg.nome) + '</div>'
+    + '<div class="msg-bub">' + escHtml(msg.texto) + '</div>'
+    + '<div class="msg-hora">' + hora + '</div>';
+  container.appendChild(div);
+  if (chatAberto) container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function mostrarChatBtn() {
+  document.getElementById('chat-btn').style.display = 'flex';
+}
+
+
+// ── SAIR DA SALA ────────────────────────────────────────────
+function mostrarBtnSair() {
+  document.getElementById('btn-sair-sala').style.display = 'flex';
+}
+
+function confirmarSaida() {
+  showModal('Sair da Sala?',
+    'Tem certeza que quer sair? O adversário ganhará a partida.',
+    [
+      { txt: '✖ Sair', cls: 'btn-red', fn: () => {
+        fecharModal();
+        if (salaRef) {
+          // Marca que este jogador saiu — adversário recebe notificação
+          salaRef.update({ [`saiu`]: meuId, status: 'fim', vencedorFinal: adv(), pontos: estadoJogo?.pontos || {j1:0,j2:0} });
+        }
+        setTimeout(() => { if (salaRef) salaRef.off(); location.reload(); }, 400);
+      }},
+      { txt: 'Continuar', cls: 'btn-green', fn: fecharModal }
+    ]
+  );
+}
+
+function monitorarDesconexao() {
+  if (!salaRef) return;
+  // Se este jogador fechar o app, marca como offline no Firebase
+  const presRef = db.ref(`salas/${salaId}/jogadores/${meuId}/online`);
+  presRef.onDisconnect().set(false);
+
+  // Monitora se o adversário ficou offline
+  const advPresRef = db.ref(`salas/${salaId}/jogadores/${adv()}/online`);
+  advPresRef.on('value', snap => {
+    const online = snap.val();
+    if (online === false && estadoJogo?.status === 'jogando') {
+      document.getElementById('banner-desconect').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('banner-desconect').style.display = 'none';
+      }, 5000);
+    }
+  });
+}
+
 // ── BOOT ─────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
   initFirebase();tela('login');
   document.getElementById('inp-nome').addEventListener('keypress',ev=>{if(ev.key==='Enter')criarSala();});
+  document.getElementById('chat-input').addEventListener('keypress',ev=>{if(ev.key==='Enter')enviarMsg();});
   document.getElementById('inp-codigo').addEventListener('keypress',ev=>{if(ev.key==='Enter')entrarSala();});
   // evitar zoom duplo toque iOS
   let lt=0;
