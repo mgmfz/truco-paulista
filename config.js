@@ -12,13 +12,13 @@
 // ============================================================
 
 const FIREBASE_CONFIG = {
-  apiKey: "SUA_API_KEY_AQUI",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyDhCcK8GrtMgIKTxScR_fJ8-2QRjrtDj04",
+  authDomain: "truco-paulista-cf395.firebaseapp.com",
+  databaseURL: "https://truco-paulista-cf395-default-rtdb.firebaseio.com",
+  projectId: "truco-paulista-cf395",
+  storageBucket: "truco-paulista-cf395.firebasestorage.app",
+  messagingSenderId: "455054101503",
+  appId: "1:455054101503:web:94ca181aca60f447bb75ca"
 };
 
 // ============================================================
