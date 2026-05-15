@@ -71,7 +71,9 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 .adv-cartas{display:flex;justify-content:center;gap:8px;min-height:94px;align-items:center;}
 
 /* Mesa centro */
-.mesa-centro{flex:1;display:flex;align-items:center;justify-content:center;gap:22px;min-height:110px;}
+.mesa-centro{flex:1;display:flex;align-items:center;justify-content:center;gap:22px;min-height:110px;position:relative;}
+.drop-hint-text{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:.72rem;color:rgba(201,162,39,0);font-weight:700;letter-spacing:.5px;transition:color .2s;pointer-events:none;}
+.mesa-centro.drag-over .drop-hint-text{color:rgba(201,162,39,.8);}
 .vira-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .vira-lbl{font-size:.58rem;color:rgba(245,240,232,.38);text-transform:uppercase;letter-spacing:1px;}
 .jogadas{display:flex;gap:9px;align-items:center;min-width:120px;justify-content:center;}
@@ -163,15 +165,13 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 
 /* DRAG & DROP */
 .drop-zone{
-  position:relative;
   border:2.5px dashed rgba(201,162,39,0);
   border-radius:16px;
   transition:border-color .2s, background .2s;
-  min-width:120px;
 }
 .drop-zone.drag-over{
-  border-color:rgba(201,162,39,.7);
-  background:rgba(201,162,39,.08);
+  border-color:rgba(201,162,39,.7) !important;
+  background:rgba(201,162,39,.1) !important;
 }
 .carta.dragging{
   opacity:.35;
@@ -186,16 +186,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
   transition:none;
   border-radius:9px;
 }
-.drop-arrow{
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  font-size:1.8rem;
-  opacity:0;
-  transition:opacity .2s;
-  pointer-events:none;
-}
-.drop-zone.drag-over .drop-arrow{opacity:.9;}
+
 </style>
 </head>
 <body>
@@ -253,12 +244,13 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
     <div class="adv-cartas" id="adv-cartas"></div>
   </div>
 
-  <div class="mesa-centro">
+  <div class="mesa-centro drop-zone" id="drop-zone-principal">
     <div class="vira-wrap">
       <div class="vira-lbl">Vira</div>
       <div id="vira-el"></div>
     </div>
-    <div class="jogadas drop-zone" id="jogadas"><div class="drop-arrow">🎴</div></div>
+    <div class="jogadas" id="jogadas"></div>
+    <div class="drop-hint-text" id="drop-hint-text"></div>
   </div>
 
   <div class="minha-mao-wrap">
@@ -481,7 +473,7 @@ function render(){
   // mão adversário
   const ae=document.getElementById('adv-cartas');ae.innerHTML='';
   (e.maos?.[advId]||[]).forEach(()=>{
-    const c=document.createElement('div');c.className='carta cverso cvs';ae.appendChild(c);
+    const cv=document.createElement('div');cv.className='carta cverso cn';ae.appendChild(cv);
   });
 
   // minha mão
@@ -500,129 +492,131 @@ function renderMao(e){
   const ehVez=e.vez===meuId&&e.status==='jogando'&&e.trucoStatus==='normal';
   mao.forEach((carta,i)=>{
     const c=mkCarta(carta,`cn ${ehVez?'':'cdisabled'}`,e.manilhas||[]);
-    if(ehVez) iniciarDrag(c,i);
+    if(ehVez) bindDrag(c,i);
     el.appendChild(c);
   });
-  document.getElementById('tap-hint').textContent=ehVez?'Arraste a carta para o centro para jogar':'';
+  const dht=document.getElementById('drop-hint-text');
+  if(dht) dht.textContent=ehVez?'Solte aqui para jogar':'';
+  document.getElementById('tap-hint').textContent=ehVez?'Segure e arraste a carta até o centro':'';
 }
 
-// ── DRAG ────────────────────────────────────────────────────
-let dragIdx=null, fantasma=null, dropZoneEl=null;
+// ── DRAG & DROP ─────────────────────────────────────────────
+let dragIdx=null, dragEl=null, ghost=null;
+const DZ_ID='drop-zone-principal';
 
-function iniciarDrag(cartaEl, idx){
-  const dz=document.getElementById('jogadas');
+function getDZ(){ return document.getElementById(DZ_ID); }
 
-  // Touch events (mobile)
+function isOverDZ(x, y){
+  const dz=getDZ(); if(!dz) return false;
+  const r=dz.getBoundingClientRect();
+  // Expand hit area slightly so it's easier to drop
+  const pad=20;
+  return x>=r.left-pad && x<=r.right+pad && y>=r.top-pad && y<=r.bottom+pad;
+}
+
+function startDrag(idx, srcEl, clientX, clientY){
+  const estado=estadoJogo;
+  if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal') return false;
+  dragIdx=idx; dragEl=srcEl;
+  srcEl.classList.add('dragging');
+
+  const rect=srcEl.getBoundingClientRect();
+  ghost=srcEl.cloneNode(true);
+  ghost.classList.remove('dragging','csel');
+  ghost.classList.add('carta-fantasma');
+  // Remove any event listeners from ghost
+  ghost.style.width=rect.width+'px';
+  ghost.style.height=rect.height+'px';
+  moveDrag(clientX, clientY, rect.width, rect.height);
+  document.body.appendChild(ghost);
+  return true;
+}
+
+function moveDrag(clientX, clientY, w, h){
+  if(!ghost) return;
+  const gw = w||parseFloat(ghost.style.width);
+  const gh = h||parseFloat(ghost.style.height);
+  ghost.style.left=(clientX - gw/2)+'px';
+  ghost.style.top=(clientY - gh*0.65)+'px';
+
+  const over=isOverDZ(clientX, clientY);
+  const dz=getDZ();
+  if(dz) dz.classList.toggle('drag-over', over);
+}
+
+function endDrag(clientX, clientY){
+  const dropped=isOverDZ(clientX, clientY);
+  // cleanup
+  if(ghost){ ghost.remove(); ghost=null; }
+  if(dragEl){ dragEl.classList.remove('dragging','csel'); }
+  const dz=getDZ(); if(dz) dz.classList.remove('drag-over');
+
+  if(dropped && dragIdx!==null){
+    const estado=estadoJogo;
+    if(estado&&estado.vez===meuId&&estado.trucoStatus==='normal'){
+      const idx=dragIdx;
+      dragIdx=null; dragEl=null;
+      jogarCarta(idx, estado);
+      return;
+    }
+  }
+  dragIdx=null; dragEl=null;
+}
+
+function bindDrag(cartaEl, idx){
+  // ── TOUCH ──
   cartaEl.addEventListener('touchstart', ev=>{
     ev.preventDefault();
-    const estado=estadoJogo;
-    if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal') return;
-    dragIdx=idx;
-    dropZoneEl=dz;
-
-    // highlight card
-    cartaEl.classList.add('csel');
-
-    // create ghost
     const t=ev.touches[0];
-    const rect=cartaEl.getBoundingClientRect();
-    fantasma=cartaEl.cloneNode(true);
-    fantasma.className=cartaEl.className+' carta-fantasma';
-    fantasma.style.width=rect.width+'px';
-    fantasma.style.height=rect.height+'px';
-    fantasma.style.left=(t.clientX-rect.width/2)+'px';
-    fantasma.style.top=(t.clientY-rect.height*0.6)+'px';
-    document.body.appendChild(fantasma);
-    cartaEl.classList.add('dragging');
+    startDrag(idx, cartaEl, t.clientX, t.clientY);
   },{passive:false});
 
   cartaEl.addEventListener('touchmove', ev=>{
     ev.preventDefault();
-    if(!fantasma) return;
+    if(!ghost) return;
     const t=ev.touches[0];
-    const w=parseFloat(fantasma.style.width);
-    const h=parseFloat(fantasma.style.height);
-    fantasma.style.left=(t.clientX-w/2)+'px';
-    fantasma.style.top=(t.clientY-h*0.6)+'px';
-
-    // check if over drop zone
-    const dzRect=dz.getBoundingClientRect();
-    const over=t.clientX>=dzRect.left&&t.clientX<=dzRect.right&&t.clientY>=dzRect.top&&t.clientY<=dzRect.bottom;
-    dz.classList.toggle('drag-over', over);
+    moveDrag(t.clientX, t.clientY);
   },{passive:false});
 
   cartaEl.addEventListener('touchend', ev=>{
     ev.preventDefault();
-    if(!fantasma){dragIdx=null;return;}
+    if(!ghost){ dragIdx=null; return; }
     const t=ev.changedTouches[0];
-    const dzRect=dz.getBoundingClientRect();
-    const dropped=t.clientX>=dzRect.left&&t.clientX<=dzRect.right&&t.clientY>=dzRect.top&&t.clientY<=dzRect.bottom;
-
-    // cleanup
-    fantasma.remove(); fantasma=null;
-    dz.classList.remove('drag-over');
-    document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
-    document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
-
-    if(dropped && dragIdx!==null){
-      const estado=estadoJogo;
-      if(estado&&estado.vez===meuId&&estado.trucoStatus==='normal'){
-        jogarCarta(dragIdx, estado);
-      }
-    }
-    dragIdx=null;
+    endDrag(t.clientX, t.clientY);
   },{passive:false});
 
-  // Mouse events (desktop fallback)
+  cartaEl.addEventListener('touchcancel', ev=>{
+    if(ghost){ ghost.remove(); ghost=null; }
+    if(dragEl){ dragEl.classList.remove('dragging','csel'); }
+    const dz=getDZ(); if(dz) dz.classList.remove('drag-over');
+    dragIdx=null; dragEl=null;
+  },{passive:false});
+
+  // ── MOUSE ──
   cartaEl.addEventListener('mousedown', ev=>{
-    const estado=estadoJogo;
-    if(!estado||estado.vez!==meuId||estado.trucoStatus!=='normal') return;
-    dragIdx=idx;
-    cartaEl.classList.add('csel');
-    const rect=cartaEl.getBoundingClientRect();
-    fantasma=cartaEl.cloneNode(true);
-    fantasma.className=cartaEl.className+' carta-fantasma';
-    fantasma.style.width=rect.width+'px';
-    fantasma.style.height=rect.height+'px';
-    fantasma.style.left=(ev.clientX-rect.width/2)+'px';
-    fantasma.style.top=(ev.clientY-rect.height*0.6)+'px';
-    document.body.appendChild(fantasma);
-    cartaEl.classList.add('dragging');
+    ev.preventDefault();
+    startDrag(idx, cartaEl, ev.clientX, ev.clientY);
   });
 }
 
 document.addEventListener('mousemove', ev=>{
-  if(!fantasma) return;
-  const w=parseFloat(fantasma.style.width);
-  const h=parseFloat(fantasma.style.height);
-  fantasma.style.left=(ev.clientX-w/2)+'px';
-  fantasma.style.top=(ev.clientY-h*0.6)+'px';
-  const dz=document.getElementById('jogadas');
-  if(dz){
-    const r=dz.getBoundingClientRect();
-    const over=ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom;
-    dz.classList.toggle('drag-over',over);
-  }
+  if(ghost) moveDrag(ev.clientX, ev.clientY);
 });
 
 document.addEventListener('mouseup', ev=>{
-  if(!fantasma){dragIdx=null;return;}
-  const dz=document.getElementById('jogadas');
-  let dropped=false;
-  if(dz){
-    const r=dz.getBoundingClientRect();
-    dropped=ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom;
-    dz.classList.remove('drag-over');
-  }
-  fantasma.remove(); fantasma=null;
-  document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
-  document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
-  if(dropped&&dragIdx!==null){
-    const estado=estadoJogo;
-    if(estado&&estado.vez===meuId&&estado.trucoStatus==='normal') jogarCarta(dragIdx,estado);
-  }
-  dragIdx=null;
+  if(ghost) endDrag(ev.clientX, ev.clientY);
+  else if(dragIdx!==null){ dragIdx=null; dragEl=null; }
 });
+
+// Safety: cancel drag if window loses focus
+window.addEventListener('blur', ()=>{
+  if(ghost){ ghost.remove(); ghost=null; }
+  if(dragEl){ dragEl.classList.remove('dragging','csel'); }
+  const dz=getDZ(); if(dz) dz.classList.remove('drag-over');
+  dragIdx=null; dragEl=null;
+});
+
+
 
 function mkCarta(carta,extra,man){
   const el=document.createElement('div');
