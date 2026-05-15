@@ -2,1472 +2,570 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d4526">
 <title>Truco Paulista</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito:wght@400;600;700;800&display=swap');
-
-  :root {
-    --verde: #1a6b3c;
-    --verde-escuro: #0d4526;
-    --verde-claro: #2d9a58;
-    --dourado: #c9a227;
-    --dourado-claro: #f0c040;
-    --vermelho: #c0392b;
-    --branco: #f5f0e8;
-    --creme: #e8dfc8;
-    --texto: #1a1208;
-    --sombra: rgba(0,0,0,0.4);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--verde-escuro);
-    color: var(--branco);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ---- Mesa de feltro ---- */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 50%, #1e7a42 0%, #0d4526 100%);
-    z-index: -2;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px),
-      repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px);
-    z-index: -1;
-  }
-
-  h1, h2, .titulo-truco {
-    font-family: 'Abril Fatface', serif;
-  }
-
-  /* ---- Tela de login ---- */
-  #tela-login {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 2rem;
-    gap: 1.5rem;
-  }
-
-  .logo-truco {
-    font-family: 'Abril Fatface', serif;
-    font-size: clamp(3rem, 12vw, 5rem);
-    color: var(--dourado-claro);
-    text-shadow: 3px 3px 0 #7a5c00, 6px 6px 16px rgba(0,0,0,0.5);
-    letter-spacing: 2px;
-    text-align: center;
-    line-height: 1;
-  }
-
-  .logo-sub {
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
-    color: var(--creme);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    opacity: 0.8;
-    margin-top: -0.5rem;
-  }
-
-  .card-login {
-    background: rgba(10, 40, 20, 0.7);
-    border: 2px solid rgba(201,162,39,0.4);
-    border-radius: 16px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 400px;
-    backdrop-filter: blur(8px);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .card-login h2 {
-    font-family: 'Abril Fatface', serif;
-    color: var(--dourado-claro);
-    font-size: 1.4rem;
-    text-align: center;
-  }
-
-  .input-grupo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .input-grupo label {
-    font-size: 0.85rem;
-    color: var(--creme);
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .input-grupo input {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1.5px solid rgba(201,162,39,0.3);
-    background: rgba(0,0,0,0.3);
-    color: var(--branco);
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .input-grupo input:focus {
-    border-color: var(--dourado);
-  }
-
-  .btn {
-    padding: 0.85rem 1.5rem;
-    border-radius: 10px;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
-    letter-spacing: 1px;
-  }
-  .btn:active { transform: scale(0.97); }
-
-  .btn-primario {
-    background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
-    color: #3a2000;
-    box-shadow: 0 4px 12px rgba(192,144,0,0.3);
-  }
-  .btn-primario:hover { box-shadow: 0 6px 18px rgba(192,144,0,0.5); }
-
-  .btn-secundario {
-    background: rgba(255,255,255,0.1);
-    color: var(--branco);
-    border: 1.5px solid rgba(255,255,255,0.2);
-  }
-  .btn-secundario:hover { background: rgba(255,255,255,0.15); }
-
-  .btn-vermelho {
-    background: linear-gradient(135deg, #c0392b, #e74c3c);
-    color: white;
-    box-shadow: 0 4px 12px rgba(192,57,43,0.3);
-  }
-
-  .btn-verde {
-    background: linear-gradient(135deg, #1a6b3c, #27ae60);
-    color: white;
-    box-shadow: 0 4px 12px rgba(26,107,60,0.3);
-  }
-
-  .divisor {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    color: rgba(245,240,232,0.4);
-    font-size: 0.85rem;
-  }
-  .divisor::before, .divisor::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(245,240,232,0.2);
-  }
-
-  /* ---- Aguardando sala ---- */
-  #tela-aguardando {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 2rem;
-    gap: 1.5rem;
-    text-align: center;
-  }
-
-  .codigo-sala {
-    font-family: 'Abril Fatface', serif;
-    font-size: clamp(2.5rem, 10vw, 4rem);
-    color: var(--dourado-claro);
-    letter-spacing: 8px;
-    text-shadow: 2px 2px 0 #7a5c00;
-  }
-
-  .pulse {
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: rgba(201,162,39,0.3);
-    animation: pulse 1.5s ease-in-out infinite;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.15); opacity: 1; }
-  }
-
-  /* ---- JOGO ---- */
-  #tela-jogo {
-    display: none;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  /* Placar */
-  .placar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(201,162,39,0.25);
-    border-radius: 12px;
-    padding: 0.5rem 1rem;
-  }
-
-  .placar-time {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 80px;
-  }
-
-  .placar-nome {
-    font-size: 0.75rem;
-    color: var(--creme);
-    opacity: 0.7;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-
-  .placar-pts {
-    font-family: 'Abril Fatface', serif;
-    font-size: 2.2rem;
-    color: var(--dourado-claro);
-    line-height: 1;
-  }
-
-  .placar-centro {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .placar-rodada {
-    font-size: 0.7rem;
-    color: rgba(245,240,232,0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .vidas {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 100px;
-  }
-
-  .vida {
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    border: 2px solid;
-  }
-  .vida.ativa { background: var(--dourado-claro); border-color: var(--dourado); }
-  .vida.perdida { background: transparent; border-color: rgba(255,255,255,0.2); }
-
-  /* Mesa central */
-  .mesa {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-height: 160px;
-  }
-
-  .area-adversario {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    min-height: 80px;
-    align-items: center;
-  }
-
-  .centro-mesa {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem;
-  }
-
-  .vira-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-  }
-  .vira-label {
-    font-size: 0.65rem;
-    color: rgba(245,240,232,0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .cartas-na-mesa {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-    min-height: 70px;
-  }
-
-  /* Área do jogador */
-  .area-jogador {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .minha-mao {
-    display: flex;
-    justify-content: center;
-    gap: clamp(-20px, -3vw, 8px);
-    min-height: 100px;
-    align-items: flex-end;
-    padding-bottom: 0.5rem;
-  }
-
-  /* Cartas */
-  .carta {
-    width: clamp(58px, 14vw, 72px);
-    height: clamp(85px, 21vw, 105px);
-    border-radius: 8px;
-    border: 2px solid;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 4px;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
-  }
-
-  .carta:hover:not(.carta-jogada):not(.carta-verso):not(.carta-disabled) {
-    transform: translateY(-12px) scale(1.05);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.5);
-  }
-
-  .carta.selecionada {
-    transform: translateY(-16px) scale(1.06);
-    box-shadow: 0 14px 28px rgba(255,200,0,0.4);
-  }
-
-  .carta-frente {
-    background: #fffdf7;
-    color: #1a1208;
-    border-color: #d4c9a8;
-  }
-
-  .carta-frente.ouros { color: #c0392b; }
-  .carta-frente.copas { color: #c0392b; }
-  .carta-frente.espadas { color: #1a3a6b; }
-  .carta-frente.paus { color: #1a4a1a; }
-
-  .carta-verso {
-    background: linear-gradient(135deg, #1a4a2a, #0d3018);
-    border-color: #c9a227;
-    cursor: default;
-  }
-  .carta-verso::after {
-    content: '🃏';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.8rem;
-    opacity: 0.6;
-  }
-
-  .carta-jogada {
-    cursor: default;
-    opacity: 0.85;
-  }
-
-  .carta-disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-
-  .carta-valor-top {
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
-    line-height: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .carta-valor-bot {
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
-    line-height: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    transform: rotate(180deg);
-  }
-
-  .carta-simbolo-centro {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: clamp(1.1rem, 3.5vw, 1.5rem);
-    opacity: 0.25;
-  }
-
-  .carta-num { font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 800; line-height: 1; }
-  .carta-naipe { font-size: clamp(0.7rem, 2vw, 0.9rem); line-height: 1; }
-
-  /* Carta pequena na mesa */
-  .carta-mesa {
-    width: clamp(50px, 12vw, 62px);
-    height: clamp(72px, 17vw, 88px);
-    font-size: 0.8rem;
-  }
-
-  .carta-vira {
-    width: clamp(50px, 12vw, 60px);
-    height: clamp(72px, 17vw, 85px);
-  }
-
-  /* Resultado da rodada */
-  .resultado-rodada {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-  }
-
-  .bolinha-rodada {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-  }
-  .bolinha-rodada.ganhou { background: var(--dourado-claro); border-color: var(--dourado); }
-  .bolinha-rodada.perdeu { background: var(--vermelho); border-color: #922b21; }
-  .bolinha-rodada.empatou { background: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.5); }
-
-  /* Botões de ação */
-  .acoes {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0.5rem 0;
-  }
-
-  .btn-acao {
-    padding: 0.6rem 1.2rem;
-    border-radius: 50px;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.5px;
-  }
-  .btn-acao:active { transform: scale(0.95); }
-
-  .btn-truco { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 12px rgba(231,76,60,0.4); }
-  .btn-aceitar { background: linear-gradient(135deg, #27ae60, #1a6b3c); color: white; box-shadow: 0 4px 12px rgba(39,174,96,0.4); }
-  .btn-fugir { background: linear-gradient(135deg, #7f8c8d, #5d6d7e); color: white; }
-  .btn-aumentar { background: linear-gradient(135deg, #f39c12, #d68910); color: white; box-shadow: 0 4px 12px rgba(243,156,18,0.4); }
-  .btn-mao-11 { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; }
-
-  /* Info de status */
-  .status-bar {
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--creme);
-    opacity: 0.8;
-    padding: 0.25rem;
-    min-height: 1.5rem;
-  }
-
-  .status-bar.minha-vez {
-    color: var(--dourado-claro);
-    font-weight: 700;
-    opacity: 1;
-    animation: blink-text 1s ease-in-out infinite;
-  }
-
-  @keyframes blink-text {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
-
-  /* Overlay de notificação */
-  #overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 1.5rem;
-  }
-
-  .modal {
-    background: linear-gradient(160deg, #1a4a2a, #0d2e18);
-    border: 2px solid var(--dourado);
-    border-radius: 16px;
-    padding: 2rem;
-    max-width: 320px;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-  }
-
-  .modal h2 {
-    font-family: 'Abril Fatface', serif;
-    font-size: 1.8rem;
-    color: var(--dourado-claro);
-  }
-
-  .modal p { color: var(--creme); line-height: 1.5; }
-
-  .modal-acoes {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  /* Toast */
-  #toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: rgba(10,35,18,0.95);
-    border: 1.5px solid var(--dourado);
-    color: var(--dourado-claro);
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    font-family: 'Abril Fatface', serif;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    z-index: 200;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  #toast.visivel { transform: translateX(-50%) translateY(0); }
-
-  /* Naipe grande na carta do centro */
-  .carta-grande-naipe {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: clamp(1.8rem, 5vw, 2.5rem);
-  }
-
-  /* Nome do oponente */
-  .nome-adversario {
-    font-size: 0.75rem;
-    color: rgba(245,240,232,0.6);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  /* Indicador de vez */
-  .vez-indicator {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--dourado-claro);
-    display: inline-block;
-    margin-right: 4px;
-    animation: blink-dot 1s ease-in-out infinite;
-  }
-  @keyframes blink-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .hidden { display: none !important; }
-
-  /* Tela de fim de jogo */
-  .fim-titulo {
-    font-family: 'Abril Fatface', serif;
-    font-size: clamp(2.5rem, 10vw, 4rem);
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-  }
-
-  /* Configuração Firebase */
-  .firebase-config {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(201,162,39,0.2);
-    border-radius: 8px;
-    padding: 0.75rem;
-    font-size: 0.75rem;
-    color: rgba(245,240,232,0.6);
-    text-align: center;
-    line-height: 1.6;
-  }
-
-  .firebase-config a {
-    color: var(--dourado-claro);
-    text-decoration: underline;
-  }
-
-  /* Loading spinner */
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid rgba(201,162,39,0.3);
-    border-top-color: var(--dourado-claro);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Responsivo */
-  @media (max-height: 700px) {
-    .minha-mao { min-height: 80px; }
-    .area-adversario { min-height: 60px; }
-    .carta { height: clamp(75px, 18vw, 90px); }
-  }
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito:wght@400;700;800;900&display=swap');
+:root{--verde:#1a6b3c;--verde-escuro:#0d4526;--dourado:#c9a227;--dourado-claro:#f0c040;--vermelho:#c0392b;--branco:#f5f0e8;--creme:#e8dfc8;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;width:100%;font-family:'Nunito',sans-serif;background:#0d4526;color:var(--branco);overflow:hidden;touch-action:manipulation;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 50%,#1e7a42 0%,#0a3018 100%);z-index:-2;}
+body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.01) 0,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 10px),repeating-linear-gradient(-45deg,rgba(255,255,255,0.01) 0,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 10px);z-index:-1;}
+
+/* LOGIN */
+#tela-login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:1.5rem;gap:1.1rem;overflow-y:auto;}
+.logo{font-family:'Abril Fatface',serif;font-size:clamp(2.8rem,14vw,4.5rem);color:var(--dourado-claro);text-shadow:3px 3px 0 #7a5c00,0 8px 24px rgba(0,0,0,0.5);letter-spacing:2px;line-height:1;text-align:center;}
+.logo-sub{font-size:clamp(0.72rem,3vw,1rem);color:var(--creme);letter-spacing:5px;text-transform:uppercase;opacity:.75;margin-top:-.3rem;}
+.card{background:rgba(8,32,16,.82);border:2px solid rgba(201,162,39,.35);border-radius:20px;padding:1.4rem;width:100%;max-width:380px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:.85rem;}
+.card h2{font-family:'Abril Fatface',serif;color:var(--dourado-claro);font-size:1.25rem;text-align:center;}
+.campo label{display:block;font-size:.7rem;color:var(--creme);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem;opacity:.8;}
+.campo input{width:100%;padding:.82rem 1rem;border-radius:10px;border:1.5px solid rgba(201,162,39,.25);background:rgba(0,0,0,.35);color:var(--branco);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:700;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+.campo input:focus{border-color:var(--dourado);background:rgba(0,0,0,.5);}
+.divisor{display:flex;align-items:center;gap:.7rem;color:rgba(245,240,232,.35);font-size:.78rem;}
+.divisor::before,.divisor::after{content:'';flex:1;height:1px;background:rgba(245,240,232,.15);}
+.btn{width:100%;padding:.88rem;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:transform .1s,opacity .1s;letter-spacing:.4px;user-select:none;}
+.btn:active{transform:scale(.97);opacity:.87;}
+.btn-ouro{background:linear-gradient(135deg,#c9a227,#f0c040);color:#2a1500;}
+.btn-ghost{background:rgba(255,255,255,.09);color:var(--branco);border:1.5px solid rgba(255,255,255,.18);}
+.btn-red{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
+.btn-green{background:linear-gradient(135deg,#145e30,#27ae60);color:#fff;}
+.hint{font-size:.74rem;color:rgba(245,240,232,.42);text-align:center;line-height:1.55;max-width:280px;}
+.hint a{color:var(--dourado-claro);}
+
+/* AGUARDANDO */
+#tela-aguardando{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:2rem;gap:1.1rem;text-align:center;}
+.codigo-sala{font-family:'Abril Fatface',serif;font-size:clamp(3rem,16vw,5rem);color:var(--dourado-claro);letter-spacing:10px;text-shadow:3px 3px 0 #7a5c00;}
+.pulse{width:54px;height:54px;border-radius:50%;background:rgba(201,162,39,.25);animation:pulseA 1.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+@keyframes pulseA{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.18);opacity:1}}
+
+/* JOGO */
+#tela-jogo{display:none;flex-direction:column;height:100%;max-width:480px;margin:0 auto;padding:max(env(safe-area-inset-top),8px) 8px max(env(safe-area-inset-bottom),8px);gap:5px;}
+
+/* Placar */
+.placar{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.42);border:1px solid rgba(201,162,39,.2);border-radius:14px;padding:6px 12px;flex-shrink:0;}
+.ptime{display:flex;flex-direction:column;align-items:center;min-width:68px;}
+.pnome{font-size:.67rem;color:var(--creme);opacity:.62;text-transform:uppercase;letter-spacing:1px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
+.ppts{font-family:'Abril Fatface',serif;font-size:2rem;color:var(--dourado-claro);line-height:1;}
+.pcentro{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.pinfo{font-size:.6rem;color:rgba(245,240,232,.42);text-transform:uppercase;letter-spacing:1px;}
+.rod-bols{display:flex;gap:5px;}
+.bol{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
+.bol.ganhou{background:var(--dourado-claro);border-color:var(--dourado);}
+.bol.perdeu{background:#e74c3c;border-color:#922b21;}
+.bol.empate{background:rgba(255,255,255,.35);border-color:rgba(255,255,255,.4);}
+
+/* Status */
+.sb{text-align:center;font-size:.82rem;color:var(--creme);opacity:.75;min-height:22px;flex-shrink:0;padding:0 4px;}
+.sb.minha{color:var(--dourado-claro);opacity:1;font-weight:800;animation:bT 1s ease-in-out infinite;}
+@keyframes bT{0%,100%{opacity:1}50%{opacity:.55}}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dourado-claro);display:inline-block;margin-right:5px;animation:bT 1s ease-in-out infinite;}
+
+/* Adversário */
+.adv-area{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.adv-nome{font-size:.66rem;color:rgba(245,240,232,.48);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.adv-cartas{display:flex;justify-content:center;gap:6px;min-height:68px;align-items:center;}
+
+/* Mesa centro */
+.mesa-centro{flex:1;display:flex;align-items:center;justify-content:center;gap:18px;min-height:88px;}
+.vira-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.vira-lbl{font-size:.58rem;color:rgba(245,240,232,.38);text-transform:uppercase;letter-spacing:1px;}
+.jogadas{display:flex;gap:9px;align-items:center;min-width:120px;justify-content:center;}
+
+/* Minha mão */
+.minha-mao-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.minha-mao{display:flex;justify-content:center;align-items:flex-end;gap:clamp(-8px,-1vw,6px);padding-bottom:2px;min-height:clamp(92px,22vw,118px);}
+.tap-hint{font-size:.68rem;color:rgba(245,240,232,.4);text-align:center;min-height:16px;}
+
+/* Ações */
+.acoes{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;flex-shrink:0;padding:2px 0 2px;}
+.ba{padding:11px 20px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;transition:transform .12s,box-shadow .12s;user-select:none;min-height:46px;}
+.ba:active{transform:scale(.93);}
+.ba-truco{background:linear-gradient(135deg,#b0331f,#e74c3c);color:#fff;box-shadow:0 4px 14px rgba(192,57,43,.35);}
+.ba-aceitar{background:linear-gradient(135deg,#145e30,#27ae60);color:#fff;box-shadow:0 4px 14px rgba(27,174,96,.35);}
+.ba-fugir{background:rgba(90,90,100,.55);color:var(--branco);border:1.5px solid rgba(255,255,255,.15);}
+.ba-aumentar{background:linear-gradient(135deg,#a06a08,#f0a820);color:#2a1000;box-shadow:0 4px 14px rgba(192,144,0,.3);}
+
+/* CARTAS */
+.carta{border-radius:9px;border:2px solid;display:flex;flex-direction:column;justify-content:space-between;padding:3px 4px;position:relative;user-select:none;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;flex-shrink:0;cursor:pointer;}
+.cn{width:clamp(62px,16vw,78px);height:clamp(94px,24vw,118px);}
+.cm{width:clamp(50px,13vw,64px);height:clamp(74px,19vw,92px);}
+.cv{width:clamp(46px,12vw,58px);height:clamp(68px,17vw,84px);}
+.cvs{width:clamp(42px,11vw,54px);height:clamp(62px,16vw,78px);}
+.cf{background:#fffdf5;border-color:#d4c9a0;}
+.cf.ouros,.cf.copas{color:#c0392b;}
+.cf.espadas{color:#1a3566;}
+.cf.paus{color:#1a4a1a;}
+.cverso{background:linear-gradient(145deg,#1c4f2a,#0c2e18);border-color:#c9a227;cursor:default;}
+.cverso::after{content:'🃏';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.5rem;opacity:.5;}
+.cjogada{cursor:default;}
+.cdisabled{cursor:not-allowed;opacity:.55;}
+.csel{transform:translateY(-20px) scale(1.08)!important;box-shadow:0 16px 32px rgba(240,192,64,.5)!important;}
+.cv-top{font-size:clamp(.7rem,2.2vw,.88rem);font-weight:800;line-height:1.1;display:flex;flex-direction:column;align-items:flex-start;}
+.cv-bot{font-size:clamp(.7rem,2.2vw,.88rem);font-weight:800;line-height:1.1;display:flex;flex-direction:column;align-items:flex-end;transform:rotate(180deg);}
+.cv-big{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(1.2rem,3.5vw,1.7rem);opacity:.17;pointer-events:none;}
+.cnum{font-size:clamp(.95rem,3vw,1.25rem);font-weight:900;line-height:1;}
+.csim{font-size:clamp(.65rem,2vw,.82rem);line-height:1;}
+.manilha{box-shadow:0 0 0 2.5px var(--dourado-claro),0 4px 14px rgba(240,192,64,.4)!important;}
+
+/* OVERLAY */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.67);display:none;align-items:center;justify-content:center;z-index:200;padding:1.5rem;}
+.modal{background:linear-gradient(160deg,#183d22,#0c2014);border:2px solid var(--dourado);border-radius:20px;padding:1.8rem 1.4rem;max-width:320px;width:100%;text-align:center;display:flex;flex-direction:column;gap:.95rem;box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.modal h2{font-family:'Abril Fatface',serif;font-size:1.65rem;color:var(--dourado-claro);}
+.modal p{color:var(--creme);line-height:1.55;font-size:.93rem;white-space:pre-wrap;}
+.modal-acoes{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap;}
+.modal-acoes .btn{max-width:145px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(max(env(safe-area-inset-bottom),12px) + 8px);left:50%;transform:translateX(-50%) translateY(80px);background:rgba(8,28,14,.96);border:1.5px solid var(--dourado);color:var(--dourado-claro);padding:.62rem 1.4rem;border-radius:50px;font-family:'Abril Fatface',serif;font-size:.93rem;letter-spacing:.4px;z-index:300;transition:transform .28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
-<!-- TELA LOGIN -->
+<!-- LOGIN -->
 <div id="tela-login">
-  <div class="logo-truco">🃏 Truco</div>
+  <div class="logo">🃏 Truco</div>
   <div class="logo-sub">Paulista</div>
-
-  <div class="card-login">
+  <div class="card">
     <h2>Entrar na Partida</h2>
-    <div class="input-grupo">
+    <div class="campo">
       <label>Seu Nome</label>
-      <input type="text" id="input-nome" placeholder="Ex: João" maxlength="15" autocomplete="off">
+      <input id="inp-nome" type="text" placeholder="Ex: João" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
-
-    <button class="btn btn-primario" onclick="criarSala()">🎲 Criar Nova Sala</button>
-
-    <div class="divisor">ou entre em uma sala</div>
-
-    <div class="input-grupo">
+    <button class="btn btn-ouro" onclick="criarSala()">🎲 Criar Nova Sala</button>
+    <div class="divisor">ou entre em uma sala existente</div>
+    <div class="campo">
       <label>Código da Sala</label>
-      <input type="text" id="input-codigo" placeholder="Ex: AB12" maxlength="4" autocomplete="off"
-        oninput="this.value = this.value.toUpperCase()">
+      <input id="inp-codigo" type="text" placeholder="Ex: AB12" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="this.value=this.value.toUpperCase()">
     </div>
-    <button class="btn btn-secundario" onclick="entrarSala()">🚪 Entrar na Sala</button>
-
-    <div class="firebase-config" id="aviso-config">
-      ⚙️ Configure o Firebase no arquivo <code>config.js</code> para jogar online.<br>
-      <a href="https://github.com/seu-usuario/truco-paulista#configuracao" target="_blank">Ver instruções →</a>
-    </div>
+    <button class="btn btn-ghost" onclick="entrarSala()">🚪 Entrar na Sala</button>
+    <div class="hint" id="hint-config">⚙️ Configure o Firebase em <code>config.js</code> para jogar online.</div>
   </div>
 </div>
 
-<!-- TELA AGUARDANDO -->
+<!-- AGUARDANDO -->
 <div id="tela-aguardando">
-  <div class="logo-truco" style="font-size: clamp(2rem,8vw,3.5rem)">🃏 Truco</div>
+  <div class="logo" style="font-size:clamp(2rem,9vw,3rem)">🃏 Truco Paulista</div>
   <div class="pulse">⏳</div>
-  <div style="color: var(--creme); font-size: 1rem; opacity: 0.8;">Código da Sala:</div>
+  <div style="color:var(--creme);font-size:.83rem;opacity:.7">Código da Sala</div>
   <div class="codigo-sala" id="exibe-codigo">----</div>
-  <div style="color: var(--creme); font-size: 0.9rem; opacity: 0.7; max-width: 280px; text-align: center; line-height: 1.6;">
-    Compartilhe este código com seu amigo para ele entrar na sala!
-  </div>
-  <button class="btn btn-secundario" style="max-width: 280px; width: 100%;" onclick="copiarCodigo()">
-    📋 Copiar Código
-  </button>
-  <button class="btn btn-vermelho" style="max-width: 280px; width: 100%; margin-top: 0.5rem;" onclick="sairSala()">
-    ✖ Cancelar
-  </button>
+  <div class="hint">Mande este código para seu amigo entrar na sala!</div>
+  <button class="btn btn-ghost" style="max-width:280px" onclick="copiarCodigo()">📋 Copiar Código</button>
+  <button class="btn btn-red" style="max-width:280px;margin-top:4px" onclick="sairSala()">✖ Cancelar</button>
 </div>
 
-<!-- TELA JOGO -->
+<!-- JOGO -->
 <div id="tela-jogo">
-  <!-- Placar -->
   <div class="placar">
-    <div class="placar-time">
-      <div class="placar-nome" id="nome-adv-placar">Adversário</div>
-      <div class="placar-pts" id="pts-adv">0</div>
-      <div class="vidas" id="vidas-adv"></div>
+    <div class="ptime"><div class="pnome" id="pnome-adv">Adversário</div><div class="ppts" id="ppts-adv">0</div></div>
+    <div class="pcentro">
+      <div class="pinfo" id="plbl-rod">Rodada 1/3</div>
+      <div class="rod-bols" id="bols-rod"></div>
+      <div class="pinfo">até 12 pts</div>
     </div>
-    <div class="placar-centro">
-      <div class="placar-rodada" id="label-rodada">Rodada 1</div>
-      <div class="resultado-rodada" id="resultado-rodadas"></div>
-    </div>
-    <div class="placar-time">
-      <div class="placar-nome" id="nome-eu-placar">Você</div>
-      <div class="placar-pts" id="pts-eu">0</div>
-      <div class="vidas" id="vidas-eu"></div>
-    </div>
+    <div class="ptime"><div class="pnome" id="pnome-eu">Você</div><div class="ppts" id="ppts-eu">0</div></div>
   </div>
 
-  <!-- Status -->
-  <div class="status-bar" id="status-bar">Carregando...</div>
+  <div class="sb" id="statusbar">Carregando...</div>
 
-  <!-- Mesa -->
-  <div class="mesa">
-    <!-- Adversário -->
-    <div class="nome-adversario" id="nome-adversario-topo">Adversário</div>
-    <div class="area-adversario" id="mao-adversario"></div>
-
-    <!-- Centro: vira + cartas jogadas -->
-    <div class="centro-mesa">
-      <div style="display: flex; gap: 16px; align-items: center;">
-        <div class="vira-container">
-          <div class="vira-label">Vira</div>
-          <div id="carta-vira"></div>
-        </div>
-        <div class="cartas-na-mesa" id="cartas-na-mesa"></div>
-      </div>
-    </div>
-
-    <!-- Mão do jogador -->
-    <div class="area-jogador">
-      <div class="minha-mao" id="minha-mao"></div>
-      <div class="acoes" id="acoes"></div>
-    </div>
+  <div class="adv-area">
+    <div class="adv-nome" id="adv-nome">Adversário</div>
+    <div class="adv-cartas" id="adv-cartas"></div>
   </div>
+
+  <div class="mesa-centro">
+    <div class="vira-wrap">
+      <div class="vira-lbl">Vira</div>
+      <div id="vira-el"></div>
+    </div>
+    <div class="jogadas" id="jogadas"></div>
+  </div>
+
+  <div class="minha-mao-wrap">
+    <div class="minha-mao" id="minha-mao"></div>
+    <div class="tap-hint" id="tap-hint"></div>
+  </div>
+
+  <div class="acoes" id="acoes"></div>
 </div>
 
-<!-- OVERLAY MODAL -->
+<!-- OVERLAY -->
 <div id="overlay">
-  <div class="modal" id="modal">
-    <h2 id="modal-titulo">Título</h2>
-    <p id="modal-texto">Texto</p>
-    <div class="modal-acoes" id="modal-acoes"></div>
+  <div class="modal">
+    <h2 id="modal-tit"></h2>
+    <p id="modal-txt"></p>
+    <div class="modal-acoes" id="modal-ac"></div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<!-- Configuração Firebase (editar com suas credenciais) -->
 <script src="config.js"></script>
-
 <script>
-// ============================================================
-//  TRUCO PAULISTA - Lógica do Jogo
-// ============================================================
+// ── ESTADO ──────────────────────────────────────────────────
+let db=null,salaRef=null,meuId=null,meuNome='',salaId='',estadoJogo=null,cartaSel=null;
 
-// Estado global
-let db = null;
-let salaRef = null;
-let meuId = null;
-let meuNome = '';
-let salaId = '';
-let estadoJogo = null;
-let minhaVez = false;
-let cartaSelecionada = null;
+// ── CONSTANTES ───────────────────────────────────────────────
+const NAIPES=['ouros','espadas','copas','paus'];
+const SIM={ouros:'♦',espadas:'♠',copas:'♥',paus:'♣'};
+const VALS=['4','5','6','7','Q','J','K','A','2','3'];
 
-// Naipes e valores
-const NAIPES = ['ouros', 'espadas', 'copas', 'paus'];
-const NAIPE_SIMBOLO = { ouros: '♦', espadas: '♠', copas: '♥', paus: '♣' };
-const VALORES = ['4','5','6','7','Q','J','K','A','2','3'];
-
-// Hierarquia do Truco Paulista (manilhas dependem da vira)
-// Ordem base das cartas (sem manilha): 4,5,6,7,Q,J,K,A,2,3
-// Manilhas em ordem: 4 de paus, 7 de copas, A de espadas, 7 de ouros
-
-function getOrdemCarta(carta, manilhas) {
-  if (!carta) return -1;
-  const idx = manilhas.indexOf(carta.id);
-  if (idx !== -1) return 14 + (3 - idx); // manilhas valem mais
-  const valIdx = VALORES.indexOf(carta.valor);
-  return valIdx; // 0 = mais fraco (4), 9 = mais forte (3)
+function getOrdem(carta,man){
+  if(!carta)return-1;
+  const mi=man.indexOf(carta.id);
+  if(mi!==-1)return 14+(3-mi);
+  return VALS.indexOf(carta.valor);
 }
-
-function calcularManilhas(vira) {
-  // A manilha é a próxima carta depois da vira
-  const ordemManilha = ['4','5','6','7','Q','J','K','A','2','3'];
-  const idxVira = ordemManilha.indexOf(vira.valor);
-  const valorManilha = ordemManilha[(idxVira + 1) % ordemManilha.length];
-
-  // Hierarquia das manilhas: paus > copas > espadas > ouros
-  const ordemNaipe = ['paus', 'copas', 'espadas', 'ouros'];
-  return ordemNaipe.map(n => `${valorManilha}_${n}`);
+function calcMan(vira){
+  const nxt=VALS[(VALS.indexOf(vira.valor)+1)%VALS.length];
+  return['paus','copas','espadas','ouros'].map(n=>`${nxt}_${n}`);
 }
-
-function criarBaralho() {
-  const baralho = [];
-  for (const naipe of NAIPES) {
-    for (const valor of VALORES) {
-      baralho.push({ id: `${valor}_${naipe}`, valor, naipe });
-    }
-  }
-  return baralho;
+function criarBaralho(){
+  const b=[];
+  for(const n of NAIPES)for(const v of VALS)b.push({id:`${v}_${n}`,valor:v,naipe:n});
+  return b;
 }
-
-function embaralhar(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
 
-// ============================================================
-//  Firebase Init
-// ============================================================
-function initFirebase() {
-  try {
-    if (typeof FIREBASE_CONFIG !== 'undefined') {
-      const app = firebase.initializeApp(FIREBASE_CONFIG);
-      db = firebase.database(app);
-      document.getElementById('aviso-config').style.display = 'none';
+// ── FIREBASE ────────────────────────────────────────────────
+function initFirebase(){
+  try{
+    if(typeof FIREBASE_CONFIG!=='undefined'){
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db=firebase.database();
+      document.getElementById('hint-config').style.display='none';
       return true;
     }
-  } catch(e) {}
+  }catch(e){}
   return false;
 }
 
-// ============================================================
-//  Sala
-// ============================================================
-function gerarCodigo() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length: 4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+// ── SALA ────────────────────────────────────────────────────
+function gerarCod(){return Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');}
+
+function criarSala(){
+  const nome=document.getElementById('inp-nome').value.trim();
+  if(!nome){toast('Digite seu nome!');return;}
+  if(!db){toast('Configure o Firebase primeiro!');return;}
+  meuNome=nome;meuId='j1';salaId=gerarCod();
+  salaRef=db.ref(`salas/${salaId}`);
+  salaRef.set({jogadores:{j1:{nome,online:true}},status:'aguardando',pontos:{j1:0,j2:0},criador:'j1'})
+    .then(()=>{tela('aguardando');document.getElementById('exibe-codigo').textContent=salaId;ouvirSala();});
 }
 
-function criarSala() {
-  const nome = document.getElementById('input-nome').value.trim();
-  if (!nome) { mostrarToast('Digite seu nome!'); return; }
-  if (!db) { mostrarToast('Configure o Firebase primeiro!'); return; }
-
-  meuNome = nome;
-  meuId = 'j1';
-  salaId = gerarCodigo();
-
-  const estadoInicial = {
-    jogadores: { j1: { nome, online: true } },
-    status: 'aguardando',
-    pontos: { j1: 0, j2: 0 },
-    criador: 'j1'
-  };
-
-  salaRef = db.ref(`salas/${salaId}`);
-  salaRef.set(estadoInicial).then(() => {
-    mostrarTela('aguardando');
-    document.getElementById('exibe-codigo').textContent = salaId;
-    ouvirSala();
-  });
-}
-
-function entrarSala() {
-  const nome = document.getElementById('input-nome').value.trim();
-  const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
-  if (!nome) { mostrarToast('Digite seu nome!'); return; }
-  if (codigo.length !== 4) { mostrarToast('Código inválido!'); return; }
-  if (!db) { mostrarToast('Configure o Firebase primeiro!'); return; }
-
-  meuNome = nome;
-  meuId = 'j2';
-  salaId = codigo;
-
-  salaRef = db.ref(`salas/${salaId}`);
-  salaRef.once('value', snap => {
-    const data = snap.val();
-    if (!data) { mostrarToast('Sala não encontrada!'); return; }
-    if (data.status !== 'aguardando') { mostrarToast('Sala já está em jogo!'); return; }
-
-    salaRef.child('jogadores/j2').set({ nome, online: true });
+function entrarSala(){
+  const nome=document.getElementById('inp-nome').value.trim();
+  const cod=document.getElementById('inp-codigo').value.trim().toUpperCase();
+  if(!nome){toast('Digite seu nome!');return;}
+  if(cod.length!==4){toast('Código deve ter 4 letras!');return;}
+  if(!db){toast('Configure o Firebase!');return;}
+  meuNome=nome;meuId='j2';salaId=cod;
+  salaRef=db.ref(`salas/${salaId}`);
+  salaRef.once('value',snap=>{
+    const d=snap.val();
+    if(!d){toast('Sala não encontrada!');return;}
+    if(d.status!=='aguardando'){toast('Sala já em jogo!');return;}
+    salaRef.child('jogadores/j2').set({nome,online:true});
     salaRef.child('status').set('iniciando');
-    ouvirSala();
-    mostrarTela('jogo');
+    tela('jogo');ouvirSala();
   });
 }
 
-function ouvirSala() {
-  salaRef.on('value', snap => {
-    const data = snap.val();
-    if (!data) return;
-    estadoJogo = data;
-
-    if (data.status === 'iniciando' && meuId === 'j1') {
-      iniciarPartida();
-    } else if (data.status === 'jogando') {
-      mostrarTela('jogo');
-      renderizarJogo();
-    } else if (data.status === 'fim') {
-      mostrarFimDeJogo(data);
-    }
+function ouvirSala(){
+  salaRef.on('value',snap=>{
+    const d=snap.val();if(!d)return;
+    estadoJogo=d;
+    if(d.status==='iniciando'&&meuId==='j1')iniciarPartida();
+    else if(d.status==='jogando'||d.status==='mao11'){tela('jogo');render();}
+    else if(d.status==='fim')mostrarFim(d);
   });
 }
 
-function sairSala() {
-  if (salaRef) salaRef.remove();
-  location.reload();
+function sairSala(){if(salaRef)salaRef.remove();location.reload();}
+function copiarCodigo(){
+  navigator.clipboard?.writeText(salaId).then(()=>toast('Código copiado! 📋'))
+    .catch(()=>toast(`Código: ${salaId}`));
 }
 
-function copiarCodigo() {
-  navigator.clipboard.writeText(salaId).then(() => mostrarToast('Código copiado!'));
+// ── PARTIDA ──────────────────────────────────────────────────
+function iniciarPartida(){
+  const b=shuffle(criarBaralho());
+  const vira=b[6];
+  salaRef.set({
+    ...estadoJogo,status:'jogando',vira,manilhas:calcMan(vira),
+    maos:{j1:b.slice(0,3),j2:b.slice(3,6)},
+    cartasNaMesa:{j1:null,j2:null},
+    vez:'j1',rodada:1,resultadosRodada:[],
+    valorMao:2,trucoStatus:'normal',trucoPedidoPor:null,gritouTruco:false,
+    mao11:{j1:false,j2:false}
+  });
 }
 
-// ============================================================
-//  Iniciar Partida
-// ============================================================
-function iniciarPartida() {
-  const baralho = embaralhar(criarBaralho());
-  const maoJ1 = baralho.slice(0, 3);
-  const maoJ2 = baralho.slice(3, 6);
-  const vira  = baralho[6];
-  const manilhas = calcularManilhas(vira);
-
-  const estado = {
-    ...estadoJogo,
-    status: 'jogando',
-    vira,
-    manilhas,
-    maos: { j1: maoJ1, j2: maoJ2 },
-    cartasNaMesa: { j1: null, j2: null },
-    vez: 'j1',
-    rodada: 1,
-    resultadosRodada: [],
-    valorMao: 2,
-    trucoStatus: 'normal', // normal | pedido_truco | pedido_seis | pedido_nove | pedido_doze
-    trucoPedidoPor: null,
-    gritouTruco: false,
-    mao11: { j1: false, j2: false }
+function novaMao(estado){
+  const b=shuffle(criarBaralho());
+  const vira=b[6];
+  const novo={
+    ...estado,vira,manilhas:calcMan(vira),
+    maos:{j1:b.slice(0,3),j2:b.slice(3,6)},
+    cartasNaMesa:{j1:null,j2:null},
+    vez:estado.vezProxima||'j1',
+    rodada:1,resultadosRodada:[],
+    valorMao:2,trucoStatus:'normal',trucoPedidoPor:null,gritouTruco:false,
+    mao11:{j1:false,j2:false},status:'jogando'
   };
-
-  salaRef.set(estado);
-}
-
-function novaRodada(estado) {
-  const baralho = embaralhar(criarBaralho());
-  const maoJ1 = baralho.slice(0, 3);
-  const maoJ2 = baralho.slice(3, 6);
-  const vira  = baralho[6];
-  const manilhas = calcularManilhas(vira);
-
-  const novo = {
-    ...estado,
-    vira,
-    manilhas,
-    maos: { j1: maoJ1, j2: maoJ2 },
-    cartasNaMesa: { j1: null, j2: null },
-    vez: estado.vezProxima || 'j1',
-    rodada: 1,
-    resultadosRodada: [],
-    valorMao: 2,
-    trucoStatus: 'normal',
-    trucoPedidoPor: null,
-    gritouTruco: false,
-    mao11: { j1: false, j2: false }
-  };
-
-  // Verifica mão de 11
-  const pts = estado.pontos;
-  if (pts.j1 === 11 || pts.j2 === 11) {
-    novo.mao11 = { j1: pts.j1 === 11, j2: pts.j2 === 11 };
-    novo.status = 'mao11';
-  }
-
+  const pts=estado.pontos;
+  if(pts.j1===11||pts.j2===11)novo.status='mao11';
   salaRef.set(novo);
 }
 
-// ============================================================
-//  Renderização
-// ============================================================
-function renderizarJogo() {
-  if (!estadoJogo) return;
-  const e = estadoJogo;
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
+// ── RENDER ──────────────────────────────────────────────────
+const adv=()=>meuId==='j1'?'j2':'j1';
 
-  // Placar
-  const nomeEu  = (e.jogadores?.[meuId]?.nome  || 'Você');
-  const nomeAdv = (e.jogadores?.[adv]?.nome || 'Adversário');
-  document.getElementById('nome-eu-placar').textContent = nomeEu;
-  document.getElementById('nome-adv-placar').textContent = nomeAdv;
-  document.getElementById('nome-adversario-topo').textContent = nomeAdv;
-  document.getElementById('pts-eu').textContent  = e.pontos?.[meuId] || 0;
-  document.getElementById('pts-adv').textContent = e.pontos?.[adv]   || 0;
+function render(){
+  const e=estadoJogo;if(!e)return;
+  const advId=adv();
+  const nEu=e.jogadores?.[meuId]?.nome||'Você';
+  const nAdv=e.jogadores?.[advId]?.nome||'Adversário';
 
-  // Vidas (pontos como bolinhas, máx 12)
-  renderVidas('vidas-eu',  e.pontos?.[meuId] || 0);
-  renderVidas('vidas-adv', e.pontos?.[adv]   || 0);
+  // placar
+  document.getElementById('pnome-eu').textContent=nEu;
+  document.getElementById('pnome-adv').textContent=nAdv;
+  document.getElementById('ppts-eu').textContent=e.pontos?.[meuId]||0;
+  document.getElementById('ppts-adv').textContent=e.pontos?.[advId]||0;
+  document.getElementById('adv-nome').textContent=nAdv;
+  document.getElementById('plbl-rod').textContent=`Rodada ${e.rodada||1}/3`;
 
-  // Rodada
-  document.getElementById('label-rodada').textContent = `Rodada ${e.rodada || 1}/3`;
-  renderResultadosRodada(e.resultadosRodada || []);
+  // bolinhas
+  const bl=document.getElementById('bols-rod');bl.innerHTML='';
+  for(let i=0;i<3;i++){
+    const b=document.createElement('div');b.className='bol';
+    const r=(e.resultadosRodada||[])[i];
+    if(r===meuId)b.classList.add('ganhou');
+    else if(r===advId)b.classList.add('perdeu');
+    else if(r==='empate')b.classList.add('empate');
+    bl.appendChild(b);
+  }
 
-  // Vira
-  renderCarta('carta-vira', e.vira, 'carta-vira', false, false);
+  // vira
+  const ve=document.getElementById('vira-el');ve.innerHTML='';
+  if(e.vira)ve.appendChild(mkCarta(e.vira,'cv cjogada',e.manilhas||[]));
 
-  // Cartas na mesa
-  const mesaEl = document.getElementById('cartas-na-mesa');
-  mesaEl.innerHTML = '';
-  if (e.cartasNaMesa?.j1) mesaEl.appendChild(criarCartaEl(e.cartasNaMesa.j1, 'carta-mesa carta-jogada', false));
-  if (e.cartasNaMesa?.j2) mesaEl.appendChild(criarCartaEl(e.cartasNaMesa.j2, 'carta-mesa carta-jogada', false));
+  // jogadas
+  const je=document.getElementById('jogadas');je.innerHTML='';
+  if(e.cartasNaMesa?.j1)je.appendChild(mkCarta(e.cartasNaMesa.j1,'cm cjogada',e.manilhas||[]));
+  if(e.cartasNaMesa?.j2)je.appendChild(mkCarta(e.cartasNaMesa.j2,'cm cjogada',e.manilhas||[]));
 
-  // Mão do adversário (verso)
-  const maoAdvEl = document.getElementById('mao-adversario');
-  maoAdvEl.innerHTML = '';
-  const maoAdv = e.maos?.[adv] || [];
-  maoAdv.forEach(() => {
-    const c = document.createElement('div');
-    c.className = 'carta carta-verso';
-    maoAdvEl.appendChild(c);
+  // mão adversário
+  const ae=document.getElementById('adv-cartas');ae.innerHTML='';
+  (e.maos?.[advId]||[]).forEach(()=>{
+    const c=document.createElement('div');c.className='carta cverso cvs';ae.appendChild(c);
   });
 
-  // Minha mão
-  renderMinhaMao(e);
+  // minha mão
+  renderMao(e);
+  renderAcoes(e);
 
-  // Status e ações
-  renderStatusEAcoes(e);
-
-  // Mão de 11
-  if (e.status === 'mao11') {
-    verificarMao11(e);
+  // mão 11
+  if(e.status==='mao11'&&e.pontos?.[meuId]===11&&!e.mao11?.[`${meuId}_decidiu`]){
+    setTimeout(()=>modalMao11(e),300);
   }
 }
 
-function renderVidas(elId, pontos) {
-  const el = document.getElementById(elId);
-  el.innerHTML = '';
-  for (let i = 0; i < 12; i++) {
-    const v = document.createElement('div');
-    v.className = 'vida ' + (i < pontos ? 'ativa' : 'perdida');
-    el.appendChild(v);
-  }
-}
-
-function renderResultadosRodada(resultados) {
-  const el = document.getElementById('resultado-rodadas');
-  el.innerHTML = '';
-  for (let i = 0; i < 3; i++) {
-    const b = document.createElement('div');
-    b.className = 'bolinha-rodada';
-    const r = resultados[i];
-    if (r) {
-      if (r === meuId) b.classList.add('ganhou');
-      else if (r === 'empate') b.classList.add('empatou');
-      else b.classList.add('perdeu');
+function renderMao(e){
+  const el=document.getElementById('minha-mao');el.innerHTML='';
+  const mao=e.maos?.[meuId]||[];
+  const ehVez=e.vez===meuId&&e.status==='jogando'&&e.trucoStatus==='normal';
+  mao.forEach((carta,i)=>{
+    const c=mkCarta(carta,`cn ${ehVez?'':'cdisabled'}`,e.manilhas||[]);
+    if(ehVez){
+      c.addEventListener('click',()=>tapCarta(i,c,e));
+      c.addEventListener('touchend',ev=>{ev.preventDefault();tapCarta(i,c,e);},{passive:false});
     }
-    el.appendChild(b);
-  }
-}
-
-function renderMinhaMao(e) {
-  const maoEl = document.getElementById('minha-mao');
-  maoEl.innerHTML = '';
-  const mao = e.maos?.[meuId] || [];
-  const ehMinhaVez = e.vez === meuId && e.status === 'jogando' && e.trucoStatus === 'normal';
-
-  mao.forEach((carta, i) => {
-    const c = criarCartaEl(carta, ehMinhaVez ? '' : 'carta-disabled', ehMinhaVez);
-    if (ehMinhaVez) {
-      c.onclick = () => selecionarCarta(i, c, e);
-    }
-    maoEl.appendChild(c);
+    el.appendChild(c);
   });
+  document.getElementById('tap-hint').textContent=ehVez?'Toque 1x: selecionar  ·  2x: jogar':'';
 }
 
-function selecionarCarta(idx, el, e) {
-  if (e.vez !== meuId) return;
-
-  // Primeiro clique: seleciona. Segundo clique no mesmo: joga.
-  const maoEl = document.getElementById('minha-mao');
-  const cartasEls = maoEl.querySelectorAll('.carta');
-
-  if (cartaSelecionada === idx) {
-    // Jogar carta
-    jogarCarta(idx, e);
-    cartaSelecionada = null;
-  } else {
-    cartasEls.forEach(c => c.classList.remove('selecionada'));
-    el.classList.add('selecionada');
-    cartaSelecionada = idx;
-    mostrarToast('Toque novamente para jogar!');
+function tapCarta(idx,el,e){
+  if(e.vez!==meuId||e.trucoStatus!=='normal')return;
+  if(cartaSel===idx){jogarCarta(idx,e);cartaSel=null;}
+  else{
+    document.querySelectorAll('.csel').forEach(c=>c.classList.remove('csel'));
+    el.classList.add('csel');cartaSel=idx;
   }
 }
 
-function criarCartaEl(carta, extraClasses, clicavel) {
-  const el = document.createElement('div');
-  el.className = `carta carta-frente ${carta.naipe} ${extraClasses}`;
-  el.innerHTML = `
-    <div class="carta-valor-top">
-      <span class="carta-num">${carta.valor}</span>
-      <span class="carta-naipe">${NAIPE_SIMBOLO[carta.naipe]}</span>
-    </div>
-    <div class="carta-grande-naipe">${NAIPE_SIMBOLO[carta.naipe]}</div>
-    <div class="carta-valor-bot">
-      <span class="carta-num">${carta.valor}</span>
-      <span class="carta-naipe">${NAIPE_SIMBOLO[carta.naipe]}</span>
-    </div>
-  `;
+function mkCarta(carta,extra,man){
+  const el=document.createElement('div');
+  const ehM=man.includes(carta.id);
+  el.className=`carta cf ${carta.naipe} ${extra} ${ehM?'manilha':''}`;
+  el.innerHTML=`<div class="cv-top"><span class="cnum">${carta.valor}</span><span class="csim">${SIM[carta.naipe]}</span></div><div class="cv-big">${SIM[carta.naipe]}</div><div class="cv-bot"><span class="cnum">${carta.valor}</span><span class="csim">${SIM[carta.naipe]}</span></div>`;
   return el;
 }
 
-function renderCarta(elId, carta, extraClass, clicavel) {
-  const el = document.getElementById(elId);
-  el.innerHTML = '';
-  if (!carta) return;
-  el.appendChild(criarCartaEl(carta, extraClass, clicavel));
-}
+function renderAcoes(e){
+  const sb=document.getElementById('statusbar');
+  const ac=document.getElementById('acoes');ac.innerHTML='';
+  const advId=adv();
+  const nAdv=e.jogadores?.[advId]?.nome||'Adversário';
+  const lbls={pedido_truco:'TRUCO',pedido_seis:'SEIS',pedido_nove:'NOVE',pedido_doze:'DOZE'};
+  const prxL={pedido_truco:'Seis',pedido_seis:'Nove',pedido_nove:'Doze'};
 
-function renderStatusEAcoes(e) {
-  const statusEl = document.getElementById('status-bar');
-  const acoesEl = document.getElementById('acoes');
-  acoesEl.innerHTML = '';
-
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-  const nomeAdv = e.jogadores?.[adv]?.nome || 'Adversário';
-
-  // Status de truco
-  if (e.trucoStatus !== 'normal') {
-    const quemPediu = e.trucoPedidoPor;
-    const labels = { pedido_truco: 'TRUCO', pedido_seis: 'SEIS', pedido_nove: 'NOVE', pedido_doze: 'DOZE' };
-    const proxLabel = { pedido_truco: 'Seis', pedido_seis: 'Nove', pedido_nove: 'Doze' };
-    const label = labels[e.trucoStatus] || 'TRUCO';
-
-    if (quemPediu !== meuId) {
-      // Preciso responder
-      statusEl.textContent = `${nomeAdv} pediu ${label}!`;
-      statusEl.className = 'status-bar minha-vez';
-
-      const btnAceitar = document.createElement('button');
-      btnAceitar.className = 'btn-acao btn-aceitar';
-      btnAceitar.textContent = `✓ Aceitar`;
-      btnAceitar.onclick = () => responderTruco('aceitar', e);
-      acoesEl.appendChild(btnAceitar);
-
-      const btnFugir = document.createElement('button');
-      btnFugir.className = 'btn-acao btn-fugir';
-      btnFugir.textContent = `✗ Correr`;
-      btnFugir.onclick = () => responderTruco('fugir', e);
-      acoesEl.appendChild(btnFugir);
-
-      if (proxLabel[e.trucoStatus]) {
-        const btnAumentar = document.createElement('button');
-        btnAumentar.className = 'btn-acao btn-aumentar';
-        btnAumentar.textContent = `↑ ${proxLabel[e.trucoStatus]}`;
-        btnAumentar.onclick = () => responderTruco('aumentar', e);
-        acoesEl.appendChild(btnAumentar);
-      }
-    } else {
-      statusEl.textContent = `Você pediu ${label}! Aguardando resposta...`;
-      statusEl.className = 'status-bar';
-    }
+  if(e.trucoStatus!=='normal'){
+    const lbl=lbls[e.trucoStatus]||'TRUCO';
+    if(e.trucoPedidoPor!==meuId){
+      sb.innerHTML=`⚡ ${nAdv} pediu <b>${lbl}</b>!`;sb.className='sb minha';
+      mkBa(ac,'✓ Aceitar','ba-aceitar',()=>respTruco('aceitar',e));
+      mkBa(ac,'✗ Correr','ba-fugir',()=>respTruco('fugir',e));
+      if(prxL[e.trucoStatus])mkBa(ac,`↑ ${prxL[e.trucoStatus]}`,'ba-aumentar',()=>respTruco('aumentar',e));
+    }else{sb.textContent=`Você pediu ${lbl}! Aguardando...`;sb.className='sb';}
     return;
   }
 
-  if (e.vez === meuId) {
-    statusEl.className = 'status-bar minha-vez';
-    statusEl.innerHTML = '<span class="vez-indicator"></span>Sua vez! Toque em uma carta para jogar.';
-
-    // Botão de truco (só se não gritou ainda nesta mão)
-    if (!e.gritouTruco || e.valorMao < 12) {
-      const nextTruco = { 2: 'Truco', 3: 'Seis', 6: 'Nove', 9: 'Doze' };
-      const label = nextTruco[e.valorMao] || 'Truco';
-      const btn = document.createElement('button');
-      btn.className = 'btn-acao btn-truco';
-      btn.textContent = `🔥 ${label}!`;
-      btn.onclick = () => pedirTruco(e);
-      acoesEl.appendChild(btn);
-    }
-  } else {
-    statusEl.className = 'status-bar';
-    statusEl.textContent = `Vez de ${nomeAdv}...`;
-  }
+  if(e.vez===meuId&&e.status==='jogando'){
+    sb.innerHTML='<span class="dot"></span>Sua vez! Selecione uma carta.';sb.className='sb minha';
+    const tL={2:'Truco',3:'Seis',6:'Nove',9:'Doze'}[e.valorMao];
+    if(tL&&e.valorMao<12)mkBa(ac,`🔥 ${tL}!`,'ba-truco',()=>pedirTruco(e));
+  }else{sb.className='sb';sb.textContent=`Vez de ${nAdv}...`;}
 }
 
-// ============================================================
-//  Ações de Jogo
-// ============================================================
-function jogarCarta(idx, e) {
-  if (e.vez !== meuId || e.trucoStatus !== 'normal') return;
-
-  const mao = [...e.maos[meuId]];
-  const carta = mao.splice(idx, 1)[0];
-
-  const update = {
-    [`maos/${meuId}`]: mao,
-    [`cartasNaMesa/${meuId}`]: carta
-  };
-
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-  const cartaAdv = e.cartasNaMesa?.[adv];
-
-  if (cartaAdv) {
-    // Ambos jogaram, determinar vencedor da rodada
-    const manilhas = e.manilhas || [];
-    const forca1 = getOrdemCarta(carta, manilhas);
-    const forca2 = getOrdemCarta(cartaAdv, manilhas);
-
-    let vencedor;
-    if (forca1 > forca2) vencedor = meuId;
-    else if (forca2 > forca1) vencedor = adv;
-    else vencedor = 'empate';
-
-    const resultados = [...(e.resultadosRodada || []), vencedor];
-    update['resultadosRodada'] = resultados;
-
-    // Verificar fim de mão
-    const resultado = verificarFimMao(resultados, e);
-    if (resultado) {
-      update['resultado'] = resultado;
-      setTimeout(() => processarFimMao(resultado, e), 1200);
-    } else {
-      // Próxima rodada
-      const proxVez = vencedor === 'empate' ? e.vez : vencedor;
-      update['vez'] = proxVez;
-      update['vezProxima'] = proxVez;
-      update['rodada'] = (e.rodada || 1) + 1;
-      update['cartasNaMesa'] = { j1: null, j2: null };
-    }
-  } else {
-    // Adversário ainda não jogou
-    update['vez'] = adv;
-  }
-
-  salaRef.update(update);
+function mkBa(parent,txt,cls,fn){
+  const b=document.createElement('button');
+  b.className=`ba ${cls}`;b.textContent=txt;b.onclick=fn;parent.appendChild(b);
 }
 
-function verificarFimMao(resultados, e) {
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-  const countEu  = resultados.filter(r => r === meuId).length;
-  const countAdv = resultados.filter(r => r === adv).length;
-  const countEmp = resultados.filter(r => r === 'empate').length;
-
-  if (countEu >= 2) return { vencedor: meuId };
-  if (countAdv >= 2) return { vencedor: adv };
-
-  if (resultados.length === 3) {
-    if (countEmp === 3) return { vencedor: 'empate' };
-    if (countEu === 1 && countAdv === 1 && countEmp === 1) return { vencedor: resultados[0] === 'empate' ? resultados[1] : resultados[0] };
-    if (countEmp === 2) {
-      const naoBol = resultados.find(r => r !== 'empate');
-      return { vencedor: naoBol || 'empate' };
+// ── LÓGICA ──────────────────────────────────────────────────
+function jogarCarta(idx,e){
+  if(e.vez!==meuId||e.trucoStatus!=='normal')return;
+  const mao=[...e.maos[meuId]];
+  const carta=mao.splice(idx,1)[0];
+  const advId=adv();
+  const upd={[`maos/${meuId}`]:mao,[`cartasNaMesa/${meuId}`]:carta};
+  const cAdv=e.cartasNaMesa?.[advId];
+  if(cAdv){
+    const man=e.manilhas||[];
+    const f1=getOrdem(carta,man),f2=getOrdem(cAdv,man);
+    const v=f1>f2?meuId:f2>f1?advId:'empate';
+    const res=[...(e.resultadosRodada||[]),v];
+    upd['resultadosRodada']=res;
+    const fim=verificarFim(res,advId);
+    if(fim){upd['resultado']=fim;setTimeout(()=>processarFim(fim,e),1300);}
+    else{
+      const prox=v==='empate'?e.vez:v;
+      upd['vez']=prox;upd['vezProxima']=prox;
+      upd['rodada']=(e.rodada||1)+1;
+      upd['cartasNaMesa']={j1:null,j2:null};
     }
+  }else{upd['vez']=advId;}
+  salaRef.update(upd);
+}
+
+function verificarFim(res,advId){
+  const cEu=res.filter(r=>r===meuId).length;
+  const cAd=res.filter(r=>r===advId).length;
+  const cEm=res.filter(r=>r==='empate').length;
+  if(cEu>=2)return{vencedor:meuId};
+  if(cAd>=2)return{vencedor:advId};
+  if(res.length===3){
+    if(cEm===3)return{vencedor:'empate'};
+    if(cEu===1&&cAd===1&&cEm===1)return{vencedor:res[0]==='empate'?res[1]:res[0]};
+    if(cEm===2){const nb=res.find(r=>r!=='empate');return{vencedor:nb||'empate'};}
   }
   return null;
 }
 
-function processarFimMao(resultado, e) {
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-  const pontos = { ...e.pontos };
-  const valor = e.valorMao || 2;
-
-  if (resultado.vencedor === 'empate') {
-    // Ninguém pontua (ou ambos)
-  } else {
-    pontos[resultado.vencedor] = (pontos[resultado.vencedor] || 0) + valor;
-  }
-
-  // Verificar fim de jogo
-  if (pontos.j1 >= 12 || pontos.j2 >= 12) {
-    const vencedorFinal = pontos.j1 >= 12 ? 'j1' : 'j2';
-    salaRef.update({ status: 'fim', pontos, vencedorFinal });
-    return;
-  }
-
-  // Nova mão
-  const novoEstado = { ...e, pontos, vezProxima: resultado.vencedor === 'empate' ? 'j1' : resultado.vencedor };
-  novaRodada(novoEstado);
+function processarFim(resultado,e){
+  const advId=adv();
+  const pts={...e.pontos};
+  if(resultado.vencedor!=='empate')pts[resultado.vencedor]=(pts[resultado.vencedor]||0)+(e.valorMao||2);
+  if(pts.j1>=12||pts.j2>=12){salaRef.update({status:'fim',pontos:pts,vencedorFinal:pts.j1>=12?'j1':'j2'});return;}
+  novaMao({...e,pontos:pts,vezProxima:resultado.vencedor==='empate'?'j1':resultado.vencedor});
 }
 
-function pedirTruco(e) {
-  const proxStatus = { 2: 'pedido_truco', 3: 'pedido_seis', 6: 'pedido_nove', 9: 'pedido_doze' };
-  const novoStatus = proxStatus[e.valorMao];
-  if (!novoStatus) return;
-
-  salaRef.update({
-    trucoStatus: novoStatus,
-    trucoPedidoPor: meuId,
-    gritouTruco: true
-  });
+function pedirTruco(e){
+  const prox={2:'pedido_truco',3:'pedido_seis',6:'pedido_nove',9:'pedido_doze'}[e.valorMao];
+  if(!prox)return;
+  salaRef.update({trucoStatus:prox,trucoPedidoPor:meuId,gritouTruco:true});
 }
 
-function responderTruco(resposta, e) {
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-  const proximoValor = { pedido_truco: 3, pedido_seis: 6, pedido_nove: 9, pedido_doze: 12 };
-
-  if (resposta === 'aceitar') {
-    const novoValor = proximoValor[e.trucoStatus];
-    salaRef.update({ trucoStatus: 'normal', valorMao: novoValor, trucoPedidoPor: null });
-    mostrarToast(`Truco aceito! Vale ${novoValor} pontos`);
-  } else if (resposta === 'fugir') {
-    // Quem pediu leva os pontos anteriores
-    const pontosGanhos = e.valorMao === 2 ? 1 : e.valorMao - 3;
-    const pontos = { ...e.pontos };
-    pontos[e.trucoPedidoPor] = (pontos[e.trucoPedidoPor] || 0) + pontosGanhos;
-
-    if (pontos.j1 >= 12 || pontos.j2 >= 12) {
-      const venc = pontos.j1 >= 12 ? 'j1' : 'j2';
-      salaRef.update({ status: 'fim', pontos, vencedorFinal: venc });
-    } else {
-      const novoEstado = { ...e, pontos };
-      novaRodada(novoEstado);
-    }
-  } else if (resposta === 'aumentar') {
-    const proxStatus = {
-      pedido_truco: 'pedido_seis',
-      pedido_seis: 'pedido_nove',
-      pedido_nove: 'pedido_doze'
-    };
-    const novo = proxStatus[e.trucoStatus];
-    if (novo) {
-      salaRef.update({ trucoStatus: novo, trucoPedidoPor: meuId });
-    }
+function respTruco(resp,e){
+  const advId=adv();
+  const prxV={pedido_truco:3,pedido_seis:6,pedido_nove:9,pedido_doze:12};
+  const prxS={pedido_truco:'pedido_seis',pedido_seis:'pedido_nove',pedido_nove:'pedido_doze'};
+  if(resp==='aceitar'){
+    const nv=prxV[e.trucoStatus];
+    salaRef.update({trucoStatus:'normal',valorMao:nv,trucoPedidoPor:null});
+    toast(`Truco aceito! Vale ${nv} pts 🤝`);
+  }else if(resp==='fugir'){
+    const g=e.valorMao===2?1:e.valorMao-3;
+    const pts={...e.pontos};pts[e.trucoPedidoPor]=(pts[e.trucoPedidoPor]||0)+g;
+    if(pts.j1>=12||pts.j2>=12)salaRef.update({status:'fim',pontos:pts,vencedorFinal:pts.j1>=12?'j1':'j2'});
+    else novaMao({...e,pontos:pts});
+  }else if(resp==='aumentar'){
+    const ns=prxS[e.trucoStatus];if(ns)salaRef.update({trucoStatus:ns,trucoPedidoPor:meuId});
   }
 }
 
-function verificarMao11(e) {
-  // Se EU sou o jogador com 11 pontos, mostro modal para decidir se jogo
-  if (e.pontos?.[meuId] === 11 && !e.mao11?.[`${meuId}_decidiu`]) {
-    const mao = e.maos?.[meuId] || [];
-    const manilhas = e.manilhas || [];
-    // Mostrar modal com as cartas
-    mostrarModalMao11(mao, manilhas, e);
-  }
+function modalMao11(e){
+  const advId=adv();
+  showModal('Mão de 11! 😮',
+    'Você tem 11 pontos. Veja sua mão e decida: jogar (vale 3 pts) ou correr (adversário leva 1 pt).',
+    [{txt:'🃏 Jogar!',cls:'btn-green',fn:()=>{salaRef.update({[`mao11/${meuId}_decidiu`]:'jogar',status:'jogando',valorMao:3});fecharModal();}},
+     {txt:'🏃 Correr',cls:'btn-red',fn:()=>{const pts={...e.pontos};pts[advId]=(pts[advId]||0)+1;fecharModal();novaMao({...e,pontos:pts});}}]
+  );
 }
 
-function mostrarModalMao11(mao, manilhas, e) {
-  const titulo = document.getElementById('modal-titulo');
-  const texto  = document.getElementById('modal-texto');
-  const acoes  = document.getElementById('modal-acoes');
-
-  titulo.textContent = 'Mão de 11!';
-  texto.textContent  = 'Você está com 11 pontos. Veja sua mão e decida: jogar (vale 3) ou correr (adversário leva 1).';
-  acoes.innerHTML = '';
-
-  const adv = meuId === 'j1' ? 'j2' : 'j1';
-
-  const btnJogar = document.createElement('button');
-  btnJogar.className = 'btn btn-verde';
-  btnJogar.textContent = '🃏 Jogar!';
-  btnJogar.onclick = () => {
-    salaRef.update({ [`mao11/${meuId}_decidiu`]: 'jogar', status: 'jogando', valorMao: 3 });
-    fecharModal();
-  };
-
-  const btnCorrer = document.createElement('button');
-  btnCorrer.className = 'btn btn-vermelho';
-  btnCorrer.textContent = '🏃 Correr';
-  btnCorrer.onclick = () => {
-    const pontos = { ...e.pontos };
-    pontos[adv] = (pontos[adv] || 0) + 1;
-    const novoEstado = { ...e, pontos };
-    fecharModal();
-    novaRodada(novoEstado);
-  };
-
-  acoes.appendChild(btnJogar);
-  acoes.appendChild(btnCorrer);
-  document.getElementById('overlay').style.display = 'flex';
+function mostrarFim(e){
+  const v=e.vencedorFinal;
+  const nome=e.jogadores?.[v]?.nome||(v===meuId?'Você':'Adversário');
+  const eu=v===meuId;
+  document.getElementById('modal-tit').style.color=eu?'var(--dourado-claro)':'#e74c3c';
+  showModal(eu?'🏆 Você ganhou!':'😔 Você perdeu!',
+    `${nome} venceu!\n${e.pontos?.j1||0} × ${e.pontos?.j2||0}`,
+    [{txt:'🔄 Jogar de Novo',cls:'btn-green',fn:()=>{fecharModal();if(meuId==='j1')novaMao({...e,pontos:{j1:0,j2:0}});else toast('Aguardando o host reiniciar...');}},
+     {txt:'✖ Sair',cls:'btn-red',fn:()=>{salaRef.remove();location.reload();}}]
+  );
 }
 
-function mostrarFimDeJogo(e) {
-  const vencedor = e.vencedorFinal;
-  const nomeVenc = e.jogadores?.[vencedor]?.nome || (vencedor === meuId ? 'Você' : 'Adversário');
-  const euGanhei = vencedor === meuId;
+function showModal(tit,txt,acoes){
+  document.getElementById('modal-tit').textContent=tit;
+  document.getElementById('modal-txt').textContent=txt;
+  const ac=document.getElementById('modal-ac');ac.innerHTML='';
+  acoes.forEach(a=>{const b=document.createElement('button');b.className=`btn ${a.cls}`;b.textContent=a.txt;b.onclick=a.fn;ac.appendChild(b);});
+  document.getElementById('overlay').style.display='flex';
+}
+function fecharModal(){document.getElementById('overlay').style.display='none';}
 
-  const titulo = document.getElementById('modal-titulo');
-  const texto  = document.getElementById('modal-texto');
-  const acoes  = document.getElementById('modal-acoes');
-
-  titulo.textContent = euGanhei ? '🏆 Você ganhou!' : '😔 Você perdeu!';
-  titulo.style.color = euGanhei ? 'var(--dourado-claro)' : '#e74c3c';
-  texto.textContent  = `${nomeVenc} venceu a partida!\n${e.pontos?.j1 || 0} × ${e.pontos?.j2 || 0}`;
-  acoes.innerHTML = '';
-
-  const btnRev = document.createElement('button');
-  btnRev.className = 'btn btn-verde';
-  btnRev.textContent = '🔄 Jogar Novamente';
-  btnRev.onclick = () => {
-    fecharModal();
-    if (meuId === 'j1') {
-      const estado = { ...e, status: 'jogando', pontos: { j1: 0, j2: 0 } };
-      novaRodada(estado);
-    } else {
-      mostrarToast('Aguardando o host reiniciar...');
-    }
-  };
-
-  const btnSair = document.createElement('button');
-  btnSair.className = 'btn btn-vermelho';
-  btnSair.textContent = '✖ Sair';
-  btnSair.onclick = () => { salaRef.remove(); location.reload(); };
-
-  acoes.appendChild(btnRev);
-  acoes.appendChild(btnSair);
-  document.getElementById('overlay').style.display = 'flex';
+// ── UTILS ────────────────────────────────────────────────────
+function tela(nome){
+  document.getElementById('tela-login').style.display     =nome==='login'     ?'flex':'none';
+  document.getElementById('tela-aguardando').style.display=nome==='aguardando'?'flex':'none';
+  document.getElementById('tela-jogo').style.display      =nome==='jogo'      ?'flex':'none';
+}
+let _tt;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2700);
 }
 
-function fecharModal() {
-  document.getElementById('overlay').style.display = 'none';
-}
-
-// ============================================================
-//  Utilidades de UI
-// ============================================================
-function mostrarTela(tela) {
-  document.getElementById('tela-login').style.display     = tela === 'login'     ? 'flex' : 'none';
-  document.getElementById('tela-aguardando').style.display= tela === 'aguardando'? 'flex' : 'none';
-  document.getElementById('tela-jogo').style.display      = tela === 'jogo'      ? 'flex' : 'none';
-}
-
-let toastTimeout;
-function mostrarToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('visivel');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => el.classList.remove('visivel'), 2500);
-}
-
-// ============================================================
-//  Init
-// ============================================================
-window.addEventListener('load', () => {
-  initFirebase();
-  mostrarTela('login');
-
-  // Enter nos inputs
-  document.getElementById('input-nome').addEventListener('keypress', e => {
-    if (e.key === 'Enter') criarSala();
-  });
-  document.getElementById('input-codigo').addEventListener('keypress', e => {
-    if (e.key === 'Enter') entrarSala();
-  });
+// ── BOOT ─────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  initFirebase();tela('login');
+  document.getElementById('inp-nome').addEventListener('keypress',ev=>{if(ev.key==='Enter')criarSala();});
+  document.getElementById('inp-codigo').addEventListener('keypress',ev=>{if(ev.key==='Enter')entrarSala();});
+  // evitar zoom duplo toque iOS
+  let lt=0;
+  document.addEventListener('touchend',ev=>{const n=Date.now();if(n-lt<280)ev.preventDefault();lt=n;},{passive:false});
 });
 </script>
 </body>
