@@ -497,7 +497,7 @@ function criarSala(){
   salaRef.set(estado).then(()=>{
     tela('aguardando');
     document.getElementById('exibe-codigo').textContent=salaId;
-    ouvirSala(); initChat(); mostrarControles();
+    ouvirSala(); initChat();
     renderSlots(estado);
     // Remover sala do Firebase quando todos saírem
     salaRef.onDisconnect().remove();
@@ -522,14 +522,20 @@ function entrarSala(idSala, idJogador){
     const livres=slots.filter(s=>!ocupados.includes(s));
     if(livres.length===0){toast('Sala cheia!');return;}
     meuId=livres[0];
-    salaRef.child(`jogadores/${meuId}`).set({nome,online:true});
     modoJogo=modo;
-    // Verifica se a sala ficou cheia → inicia
     const totalDepois=ocupados.length+1;
-    if(totalDepois===maxJ) salaRef.child('status').set('iniciando');
-    tela('aguardando');
-    document.getElementById('exibe-codigo').textContent=salaId;
-    ouvirSala(); initChat(); mostrarControles();
+    const ficouCheio=(totalDepois===maxJ);
+
+    // Update atômico: registra jogador e status juntos evitando race condition
+    const upd={};
+    upd[`jogadores/${meuId}`]={nome,online:true};
+    if(ficouCheio) upd['status']='iniciando';
+
+    salaRef.update(upd).then(()=>{
+      tela('aguardando');
+      document.getElementById('exibe-codigo').textContent=salaId;
+      ouvirSala(); initChat();
+    });
   });
 }
 
@@ -623,15 +629,26 @@ function ouvirSala(){
     const d=snap.val(); if(!d) return;
     estadoJogo=d;
     modoJogo=d.modo||2;
+
     if(d.status==='aguardando'){
       renderSlots(d);
       document.getElementById('exibe-codigo').textContent=salaId;
-      tela('aguardando');
+      // Só volta pra aguardando se não estiver já no jogo
+      const telaAtual=document.querySelector('.tela.ativa')?.id||'';
+      if(!telaAtual.includes('jogo')) tela('aguardando');
+
     } else if(d.status==='iniciando'){
+      // TODOS mostram tela de aguardando com "Iniciando..."
+      document.getElementById('aguardo-msg').textContent='Iniciando partida...';
+      // Só j1 distribui as cartas (evita duplicação)
       if(meuId==='j1') iniciarPartida();
+
     } else if(d.status==='jogando'||d.status==='mao11'){
-      if(modoJogo===4) { tela('jogo4'); render4(); }
+      // Esconde controles flutuantes apenas agora (quando o jogo começa de verdade)
+      mostrarControles();
+      if(modoJogo===4){ tela('jogo4'); render4(); }
       else { tela('jogo'); render2(); }
+
     } else if(d.status==='fim'){
       mostrarFim(d);
     }
