@@ -455,14 +455,24 @@ function initFirebase(){
 //  NAVEGAÇÃO DE TELAS
 // ═══════════════════════════════════════════════════════════
 function tela(nome){
-  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
-  const el=document.getElementById('tela-'+nome);
-  if(el){ el.classList.add('ativa'); el.style.display='flex'; }
-  // Esconde tela-jogo e tela-jogo4 separadamente
+  // Esconde TODAS as telas (limpando inline styles)
+  document.querySelectorAll('.tela').forEach(t=>{
+    t.classList.remove('ativa');
+    t.style.display='none';
+  });
   document.getElementById('tela-jogo').style.display='none';
   document.getElementById('tela-jogo4').style.display='none';
-  if(nome==='jogo') document.getElementById('tela-jogo').style.display='flex';
-  if(nome==='jogo4') document.getElementById('tela-jogo4').style.display='flex';
+
+  // Mostra a tela escolhida
+  if(nome==='jogo'){
+    document.getElementById('tela-jogo').style.display='flex';
+  } else if(nome==='jogo4'){
+    document.getElementById('tela-jogo4').style.display='flex';
+  } else {
+    const el=document.getElementById('tela-'+nome);
+    if(el){ el.classList.add('ativa'); el.style.display='flex'; }
+  }
+
   // Empilha estado para impedir voltar do navegador quando dentro de sala
   if(nome==='aguardando'||nome==='jogo'||nome==='jogo4'){
     try{ history.pushState(null,'',location.href); }catch(e){}
