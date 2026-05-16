@@ -507,34 +507,30 @@ function criarSala(){
 function entrarSala(idSala, idJogador){
   const nome=getNome(); if(!nome) return;
   if(!db){toast('Configure o Firebase!');return;}
-  meuNome=nome; salaId=idSala||document.getElementById('inp-codigo').value.trim().toUpperCase(); meuId=idJogador;
+  meuNome=nome;
+  salaId=idSala||document.getElementById('inp-codigo').value.trim().toUpperCase();
   if(salaId.length!==4){toast('Código deve ter 4 letras!');return;}
   salaRef=db.ref(`salas/${salaId}`);
   salaRef.once('value',snap=>{
     const d=snap.val();
     if(!d){toast('Sala não encontrada!');return;}
-    if(d.status!=='aguardando'){toast('Sala não está aguardando!');return;}
-    // Descobre qual slot está vazio
+    // Aceita tanto 'aguardando' quanto 'iniciando' (lobby pode ter race)
+    if(d.status!=='aguardando'&&d.status!=='iniciando'){
+      toast('Esta sala já está em andamento!');return;
+    }
     const ocupados=Object.keys(d.jogadores||{});
     const modo=d.modo||2;
-    const maxJ=modo; // 2 ou 4
-    const slots=ORDEM_ASSENTOS.slice(0,maxJ);
+    const slots=ORDEM_ASSENTOS.slice(0,modo);
     const livres=slots.filter(s=>!ocupados.includes(s));
     if(livres.length===0){toast('Sala cheia!');return;}
     meuId=livres[0];
     modoJogo=modo;
-    const totalDepois=ocupados.length+1;
-    const ficouCheio=(totalDepois===maxJ);
-
-    // Update atômico: registra jogador e status juntos evitando race condition
-    const upd={};
-    upd[`jogadores/${meuId}`]={nome,online:true};
-    if(ficouCheio) upd['status']='iniciando';
-
-    salaRef.update(upd).then(()=>{
+    // Registra o jogador. j1 vai detectar via ouvirSala e iniciar.
+    salaRef.child(`jogadores/${meuId}`).set({nome,online:true}).then(()=>{
       tela('aguardando');
       document.getElementById('exibe-codigo').textContent=salaId;
-      ouvirSala(); initChat();
+      ouvirSala();
+      initChat();
     });
   });
 }
@@ -617,6 +613,10 @@ function carregarSalas(){
 }
 
 function entrarPeloLobby(idSala, modo){
+  // Garante que o nome foi preenchido antes de sair do lobby
+  const nome=document.getElementById('inp-nome').value.trim();
+  if(!nome){toast('Volte e preencha seu nome!');return;}
+  meuNome=nome;
   modoJogo=modo;
   entrarSala(idSala, null);
 }
@@ -624,27 +624,31 @@ function entrarPeloLobby(idSala, modo){
 // ═══════════════════════════════════════════════════════════
 //  OUVIR SALA (tempo real)
 // ═══════════════════════════════════════════════════════════
+let _partidaIniciada=false;
+
 function ouvirSala(){
+  _partidaIniciada=false;
   salaRef.on('value',snap=>{
     const d=snap.val(); if(!d) return;
     estadoJogo=d;
     modoJogo=d.modo||2;
 
-    if(d.status==='aguardando'){
+    if(d.status==='aguardando'||d.status==='iniciando'){
       renderSlots(d);
       document.getElementById('exibe-codigo').textContent=salaId;
-      // Só volta pra aguardando se não estiver já no jogo
-      const telaAtual=document.querySelector('.tela.ativa')?.id||'';
-      if(!telaAtual.includes('jogo')) tela('aguardando');
+      tela('aguardando');
 
-    } else if(d.status==='iniciando'){
-      // TODOS mostram tela de aguardando com "Iniciando..."
-      document.getElementById('aguardo-msg').textContent='Iniciando partida...';
-      // Só j1 distribui as cartas (evita duplicação)
-      if(meuId==='j1') iniciarPartida();
+      // j1 inicia quando detecta sala cheia
+      if(meuId==='j1'&&!_partidaIniciada){
+        const numJog=Object.keys(d.jogadores||{}).length;
+        if(numJog>=modoJogo){
+          _partidaIniciada=true;
+          document.getElementById('aguardo-msg').textContent='Iniciando partida...';
+          setTimeout(()=>iniciarPartida(), 600);
+        }
+      }
 
     } else if(d.status==='jogando'||d.status==='mao11'){
-      // Esconde controles flutuantes apenas agora (quando o jogo começa de verdade)
       mostrarControles();
       if(modoJogo===4){ tela('jogo4'); render4(); }
       else { tela('jogo'); render2(); }
@@ -709,6 +713,8 @@ function shuffle(arr){
 //  INICIAR PARTIDA
 // ═══════════════════════════════════════════════════════════
 function iniciarPartida(){
+  // Proteção: não reinicia se já está jogando
+  if(estadoJogo&&estadoJogo.status==='jogando') return;
   const modo=modoJogo;
   const b=shuffle(criarBaralho());
   const vira=b[modo===4?12:6];
@@ -725,6 +731,7 @@ function iniciarPartida(){
 }
 
 function novaMao(estado){
+  _partidaIniciada=false;
   const modo=estado.modo||2;
   const b=shuffle(criarBaralho());
   const vira=b[modo===4?12:6];
@@ -754,18 +761,14 @@ function render2(){
   const ai=advId2();
   const nEu=e.jogadores?.[meuId]?.nome||'Você';
   const nAdv=e.jogadores?.[ai]?.nome||'Adversário';
-  document.getElementById('pnome-eu').textContent=nEu;
-  document.getElementById('pnome-adv').textContent=nAdv;
-  document.getElementById('ppts-eu').textContent=e.pontos?.t1||0; // simplificado
-  document.getElementById('ppts-adv').textContent=e.pontos?.t2||0;
-  document.getElementById('adv-nome').textContent=nAdv;
-  document.getElementById('plbl-rod').textContent=`Rodada ${e.rodada||1}/3`;
-
-  // Pontos corretos por time
   const euTime=timeDoJogador(meuId);
   const advTime=timeDoJogador(ai);
+  document.getElementById('pnome-eu').textContent=nEu;
+  document.getElementById('pnome-adv').textContent=nAdv;
   document.getElementById('ppts-eu').textContent=e.pontos?.[euTime]||0;
   document.getElementById('ppts-adv').textContent=e.pontos?.[advTime]||0;
+  document.getElementById('adv-nome').textContent=nAdv;
+  document.getElementById('plbl-rod').textContent=`Rodada ${e.rodada||1}/3`;
 
   // Bolinhas
   renderBolinhas('bols-rod', e.resultadosRodada||[], meuId, ai);
