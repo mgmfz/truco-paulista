@@ -643,18 +643,29 @@ function ouvirSala(){
       document.getElementById('exibe-codigo').textContent=salaId;
       tela('aguardando');
 
-      // Mostra botão "Começar" para o criador quando a sala está cheia
+      // Tela igual para todos. Só o criador consegue iniciar.
       const numJog=Object.keys(d.jogadores||{}).length;
       const salaCheia=numJog>=modoJogo;
       const btnComecar=document.getElementById('btn-comecar');
-      if(meuId===d.criador&&salaCheia){
+      const souCriador=(meuId===d.criador);
+
+      if(salaCheia){
         btnComecar.style.display='block';
-        document.getElementById('aguardo-msg').textContent='Sala cheia! Toque em "Começar Partida".';
+        if(souCriador){
+          btnComecar.textContent='▶ Começar Partida';
+          btnComecar.disabled=false;
+          btnComecar.style.opacity='1';
+          btnComecar.style.cursor='pointer';
+          document.getElementById('aguardo-msg').textContent='Sala cheia! Toque em "Começar Partida".';
+        }else{
+          btnComecar.textContent='⏳ Aguardando criador...';
+          btnComecar.disabled=true;
+          btnComecar.style.opacity='0.55';
+          btnComecar.style.cursor='not-allowed';
+          document.getElementById('aguardo-msg').textContent='Sala cheia! O criador vai iniciar.';
+        }
       }else{
         btnComecar.style.display='none';
-        if(salaCheia){
-          document.getElementById('aguardo-msg').textContent='Aguardando criador começar...';
-        }
       }
 
     } else if(d.status==='jogando'||d.status==='mao11'){
@@ -722,28 +733,55 @@ function shuffle(arr){
 //  INICIAR PARTIDA
 // ═══════════════════════════════════════════════════════════
 function forcarInicio(){
-  if(!estadoJogo) return;
+  console.log('[forcarInicio] meuId:',meuId,'criador:',estadoJogo?.criador,'jogadores:',estadoJogo?.jogadores);
+  if(!estadoJogo){toast('Aguardando estado...');return;}
   if(meuId!==estadoJogo.criador){toast('Só o criador pode começar!');return;}
+  const modo=estadoJogo.modo||modoJogo||2;
   const numJog=Object.keys(estadoJogo.jogadores||{}).length;
-  if(numJog<modoJogo){toast(`Faltam ${modoJogo-numJog} jogador(es)!`);return;}
+  if(numJog<modo){toast(`Faltam ${modo-numJog} jogador(es)!`);return;}
+  toast('Iniciando partida...');
   iniciarPartida();
 }
 
 function iniciarPartida(){
-  // Proteção: não reinicia se já está jogando
-  if(estadoJogo&&estadoJogo.status==='jogando') return;
-  const modo=modoJogo;
+  console.log('[iniciarPartida] chamada, estado:',estadoJogo?.status,'modo:',modoJogo,'meuId:',meuId);
+  if(estadoJogo&&estadoJogo.status==='jogando'){
+    console.log('[iniciarPartida] já está jogando, abortando');
+    return;
+  }
+  const modo=modoJogo||estadoJogo?.modo||2;
   const b=shuffle(criarBaralho());
   const vira=b[modo===4?12:6];
   const maos={};
   if(modo===2){ maos.j1=b.slice(0,3); maos.j2=b.slice(3,6); }
   else { maos.j1=b.slice(0,3); maos.j2=b.slice(3,6); maos.j3=b.slice(6,9); maos.j4=b.slice(9,12); }
-  salaRef.set({
-    ...estadoJogo, status:'jogando', vira, manilhas:calcMan(vira),
-    maos, cartasNaMesa:{}, vez:'j1',
-    rodada:1, resultadosRodada:[], valorMao:2,
-    trucoStatus:'normal', trucoPedidoPor:null, gritouTruco:false,
+  // Preservar jogadores, criador, modo, pontos. Não usar ...estadoJogo (pode trazer lixo)
+  const novoEstado={
+    jogadores: estadoJogo?.jogadores||{},
+    criador: estadoJogo?.criador||'j1',
+    modo: modo,
+    pontos: estadoJogo?.pontos||{t1:0,t2:0},
+    publica: estadoJogo?.publica||true,
+    criadoEm: estadoJogo?.criadoEm||Date.now(),
+    status:'jogando',
+    vira, manilhas:calcMan(vira),
+    maos,
+    cartasNaMesa: null,
+    vez:'j1',
+    rodada:1,
+    resultadosRodada:[],
+    valorMao:2,
+    trucoStatus:'normal',
+    trucoPedidoPor:null,
+    gritouTruco:false,
     mao11:{j1:false,j2:false,j3:false,j4:false}
+  };
+  console.log('[iniciarPartida] gravando estado:',novoEstado);
+  salaRef.set(novoEstado).then(()=>{
+    console.log('[iniciarPartida] sucesso!');
+  }).catch(err=>{
+    console.error('[iniciarPartida] ERRO:',err);
+    toast('Erro ao iniciar: '+err.message);
   });
 }
 
