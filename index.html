@@ -299,13 +299,14 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 <!-- ═══ AGUARDANDO ═══ -->
 <div id="tela-aguardando" class="tela">
   <div class="logo" style="font-size:clamp(2rem,9vw,3rem)">🃏 Truco Paulista</div>
-  <div class="pulse">⏳</div>
+  <div class="pulse" id="aguardo-pulse">⏳</div>
   <div style="color:var(--creme);font-size:.82rem;opacity:.65">Código da Sala</div>
   <div class="codigo-sala" id="exibe-codigo">----</div>
   <div id="jogador-slots-container" class="jogador-slots"></div>
   <div style="color:var(--creme);font-size:.8rem;opacity:.6;max-width:280px;text-align:center;line-height:1.6" id="aguardo-msg">Aguardando jogadores...</div>
+  <button class="btn btn-ouro" id="btn-comecar" style="max-width:280px;display:none" onclick="forcarInicio()">▶ Começar Partida</button>
   <button class="btn btn-ghost" style="max-width:280px" onclick="copiarCodigo()">📋 Copiar Código</button>
-  <button class="btn btn-red" style="max-width:280px" onclick="sairSala()">✖ Sair</button>
+  <button class="btn btn-red" style="max-width:280px" onclick="confirmarSairSala()">✖ Sair da Sala</button>
 </div>
 
 <!-- ═══ JOGO 2P ═══ -->
@@ -462,6 +463,10 @@ function tela(nome){
   document.getElementById('tela-jogo4').style.display='none';
   if(nome==='jogo') document.getElementById('tela-jogo').style.display='flex';
   if(nome==='jogo4') document.getElementById('tela-jogo4').style.display='flex';
+  // Empilha estado para impedir voltar do navegador quando dentro de sala
+  if(nome==='aguardando'||nome==='jogo'||nome==='jogo4'){
+    try{ history.pushState(null,'',location.href); }catch(e){}
+  }
 }
 
 function setModo(n, btn){
@@ -638,13 +643,17 @@ function ouvirSala(){
       document.getElementById('exibe-codigo').textContent=salaId;
       tela('aguardando');
 
-      // j1 inicia quando detecta sala cheia
-      if(meuId==='j1'&&!_partidaIniciada){
-        const numJog=Object.keys(d.jogadores||{}).length;
-        if(numJog>=modoJogo){
-          _partidaIniciada=true;
-          document.getElementById('aguardo-msg').textContent='Iniciando partida...';
-          setTimeout(()=>iniciarPartida(), 600);
+      // Mostra botão "Começar" para o criador quando a sala está cheia
+      const numJog=Object.keys(d.jogadores||{}).length;
+      const salaCheia=numJog>=modoJogo;
+      const btnComecar=document.getElementById('btn-comecar');
+      if(meuId===d.criador&&salaCheia){
+        btnComecar.style.display='block';
+        document.getElementById('aguardo-msg').textContent='Sala cheia! Toque em "Começar Partida".';
+      }else{
+        btnComecar.style.display='none';
+        if(salaCheia){
+          document.getElementById('aguardo-msg').textContent='Aguardando criador começar...';
         }
       }
 
@@ -712,6 +721,14 @@ function shuffle(arr){
 // ═══════════════════════════════════════════════════════════
 //  INICIAR PARTIDA
 // ═══════════════════════════════════════════════════════════
+function forcarInicio(){
+  if(!estadoJogo) return;
+  if(meuId!==estadoJogo.criador){toast('Só o criador pode começar!');return;}
+  const numJog=Object.keys(estadoJogo.jogadores||{}).length;
+  if(numJog<modoJogo){toast(`Faltam ${modoJogo-numJog} jogador(es)!`);return;}
+  iniciarPartida();
+}
+
 function iniciarPartida(){
   // Proteção: não reinicia se já está jogando
   if(estadoJogo&&estadoJogo.status==='jogando') return;
@@ -1215,7 +1232,24 @@ function confirmarSaida(){
   ]);
 }
 
-function sairSala(){if(salaRef)salaRef.remove();location.reload();}
+function sairSala(){
+  if(salaRef){
+    // Se sou o criador, remove a sala toda. Senão, só remove meu jogador.
+    if(estadoJogo&&meuId===estadoJogo.criador){
+      salaRef.remove();
+    } else {
+      salaRef.child(`jogadores/${meuId}`).remove();
+    }
+  }
+  location.reload();
+}
+
+function confirmarSairSala(){
+  showModal('Sair da Sala?','Você quer mesmo sair?',[
+    {txt:'Continuar',cls:'btn-green',fn:fecharModal},
+    {txt:'Sair',cls:'btn-red',fn:()=>{fecharModal();sairSala();}}
+  ]);
+}
 function copiarCodigo(){
   navigator.clipboard?.writeText(salaId).then(()=>toast('Código copiado! 📋'))
     .catch(()=>toast(`Código: ${salaId}`));
@@ -1292,7 +1326,27 @@ window.addEventListener('load',()=>{
   document.getElementById('inp-nome').addEventListener('keypress',ev=>{if(ev.key==='Enter')criarSala();});
   document.getElementById('inp-codigo').addEventListener('keypress',ev=>{if(ev.key==='Enter')entrarSalaComCodigo();});
   document.getElementById('chat-input').addEventListener('keypress',ev=>{if(ev.key==='Enter')enviarMsg();});
+
+  // Bloqueia voltar do navegador quando estiver em uma sala
+  window.addEventListener('popstate',ev=>{
+    if(salaRef){
+      // Reinsere um estado para impedir o voltar
+      history.pushState(null,'',location.href);
+      confirmarSairSala();
+    }
+  });
+
+  // Avisa antes de fechar a aba se estiver em sala
+  window.addEventListener('beforeunload',ev=>{
+    if(salaRef&&estadoJogo&&(estadoJogo.status==='jogando'||estadoJogo.status==='aguardando')){
+      ev.preventDefault();
+      ev.returnValue='Você está em uma partida. Deseja realmente sair?';
+      return ev.returnValue;
+    }
+  });
 });
+
+
 </script>
 </body>
 </html>
